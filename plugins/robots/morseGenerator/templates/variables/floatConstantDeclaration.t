@@ -1,0 +1,1 @@
+@@NAME@@ = @@VALUE@@ #float const
