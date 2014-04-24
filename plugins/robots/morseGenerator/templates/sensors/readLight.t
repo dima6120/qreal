@@ -1,1 +1,1 @@
-read_light_sensor()
+read_light_sensor(@@PORT@@)

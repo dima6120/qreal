@@ -1,6 +1,10 @@
 #pragma once
 
 #include <robotsGeneratorPluginBase.h>
+#include <QtCore/QProcess>
+#include <QtCore/QProcessEnvironment>
+
+#include <qrgui/toolPluginInterface/usedInterfaces/errorReporterInterface.h>
 
 namespace qReal {
 namespace robots {
@@ -20,7 +24,10 @@ public:
 	QList<qReal::ActionInfo> actions() override;
 
 private slots:
-	bool run3Dmodel();
+	void runBlender();
+	void runSimulation();
+	void blenderFinished(int exitCode, QProcess::ExitStatus exitStatus);
+	void scriptFinished(int exitCode, QProcess::ExitStatus exitStatus);
 
 private:
 	MasterGeneratorBase *masterGenerator() override;
@@ -29,16 +36,24 @@ private:
 	QString extension() const override;
 	QString extDescrition() const override;
 	QString generatorName() const override;
-	void checkMorseAndBlender();
+	bool checkMorseAndBlender();
 
-	/// Action that launches code generator
-	QAction mGenerateCodeAction;
+	QAction mRunBlenderAction;
+	QAction mRunSimulationAction;
+
+	//qReal::ErrorReporterInterface *mErrorReporter;
 
 	/// When true, Morse and Blender required version are found by QReal and using 3D model is possible
 	bool mMorseAndBlenderPresent;
+	bool mBlenderIsRunning;
+
+	QString mBlenderLocation;
 
 	/// Translator object for this plugin
 	QTranslator mAppTranslator;
+
+	QProcess mBlender;
+	QProcess mScript;
 };
 
 }

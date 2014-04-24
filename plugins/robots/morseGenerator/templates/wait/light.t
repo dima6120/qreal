@@ -1,2 +1,2 @@
-while (!(100 - ecrobot_get_light_sensor(@@PORT@@) * 100 / 1023 @@SIGN@@ @@PERCENTS@@)) {
-}
+while not (read_light_sensor(@@PORT@@) @@SIGN@@ @@PERCENTS@@):
+	time.sleep(0.01)

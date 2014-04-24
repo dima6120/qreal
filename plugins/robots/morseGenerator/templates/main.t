@@ -1,6 +1,8 @@
 import time
 import sys
 import random
+from consts import *
+from readfunctions import *
 
 try:
     from pymorse import Morse
@@ -8,17 +10,6 @@ except ImportError:
     print("you need first to install pymorse, the Python bindings for MORSE!")
     sys.exit(1)
 	
-#const
-WHITE_COLOR = 0
-BLACK_COLOR = 1
-BLUE_COLOR = 2
-RED_COLOR = 3
-GREEN_COLOR = 4
-YELLOW_COLOR = 5
-PORT_A = 0
-PORT_B = 1
-PORT_C = 2
-#vars
 isUsed = [False, False, False]
 LPower = 0
 RPower = 0
@@ -26,9 +17,6 @@ RPower = 0
 def setMotorSpeed(port, power):
 	global RPower
 	global LPower
-	global PORT_A
-	global PORT_B
-	global PORT_C
 	global isUsed
 	global motion
 	if port == PORT_C:
@@ -62,9 +50,6 @@ def setMotorSpeed(port, power):
 def stopMotor(port):
 	global RPower
 	global LPower
-	global PORT_A
-	global PORT_B
-	global PORT_C
 	global isUsed
 	global motion
 	if port == PORT_C:
@@ -82,8 +67,6 @@ def stopMotor(port):
 	v = (rs + ls) / 2
 	w = rs - ls
 	motion.publish({"v": v, "w": w})
-	
-@@READFUNCTIONS@@
 
 simu = Morse()
 	

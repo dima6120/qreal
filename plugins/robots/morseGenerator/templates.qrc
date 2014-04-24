@@ -81,8 +81,7 @@
 	<file>templates/getSensor.t</file>
 	<file>templates/initSensor/initSonarSensor.t</file>
 	<file>templates/initSensor/initTouchSensor.t</file>
-	<file>templates/readSensor/readTouchSensor.t</file>
-	<file>templates/readSensor/readSonarSensor.t</file>
+	<file>templates/initSensor/initColorLightSensor.t</file>
 	<file>templates/build.t</file>
 	<file>templates/tempfile.t</file>
     </qresource>

@@ -132,7 +132,7 @@ bool RobotsGeneratorPluginBase::generateCode(bool openTab)
 	Id const activeDiagram = mMainWindowInterface->activeDiagram();
 
 	QString const generatedCode = utils::InFile::readAll(generatedSrcPath);
-	if (!generatedCode.isEmpty()) {
+	if (!generatedCode.isEmpty() && openTab) {
 		mTextManager->showInTextEditor(path, generatorName());
 	}
 

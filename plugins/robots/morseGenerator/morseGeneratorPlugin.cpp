@@ -14,12 +14,28 @@ using namespace qReal::robots::generators;
 using namespace morse;
 
 MorseGeneratorPlugin::MorseGeneratorPlugin()
-	: mGenerateCodeAction(nullptr)
+	: mRunBlenderAction(nullptr)
+	, mRunSimulationAction(nullptr)
+	//, mErrorReporter(mMainWindowInterface->errorReporter())
 	, mMorseAndBlenderPresent(false)
+	, mBlenderIsRunning(false)
+	, mBlenderLocation("")
 {
 	mAppTranslator.load(":/morseGenerator_" + QLocale::system().name());
-	QApplication::installTranslator(&mAppTranslator);
-	checkMorseAndBlender();
+	QApplication::installTranslator(&mAppTranslator);;
+
+	if (checkMorseAndBlender()) {
+		QProcessEnvironment environment(QProcessEnvironment::systemEnvironment());
+		QString pythonPath = "@PYTHONPATH@/DLLs;@PYTHONPATH@/lib;@PYTHONPATH@;@PYTHONPATH@/lib/site-packages;@MORSEPATH@/Lib/site-packages";
+		environment.insert("MORSE_BLENDER", mBlenderLocation + "/blender.exe");
+		environment.insert("MORSE_NODE", "QReal");
+		environment.insert("PYHTONPATH", pythonPath.replace("@@PYTHONPATH@@", qApp->applicationDirPath() + "/python").replace(
+								   "@@MORSEPATH@@", qApp->applicationDirPath() + "/morse"));
+		mBlender.setProcessEnvironment(environment);
+		mScript.setProcessEnvironment(environment);
+		connect(&mBlender, SIGNAL(finished(int, QProcess::ExitStatus)), this, SLOT(blenderFinished(int, QProcess::ExitStatus)));
+		connect(&mScript, SIGNAL(finished(int, QProcess::ExitStatus)), this, SLOT(scriptFinished(int, QProcess::ExitStatus)));
+	}
 }
 
 MorseGeneratorPlugin::~MorseGeneratorPlugin()
@@ -28,10 +44,15 @@ MorseGeneratorPlugin::~MorseGeneratorPlugin()
 
 QList<ActionInfo> MorseGeneratorPlugin::actions()
 {
-	ActionInfo generateCodeActionInfo(&mGenerateCodeAction, "generators", "tools");
-	connect(&mGenerateCodeAction, SIGNAL(triggered()), this, SLOT(run3Dmodel()));
+	mRunBlenderAction.setText(tr("Run 3D model"));
+	ActionInfo runBlenderActionInfo(&mRunBlenderAction, "generators", "tools");
+	connect(&mRunBlenderAction, SIGNAL(triggered()), this, SLOT(runBlender()));
 
-	return { generateCodeActionInfo };
+	mRunSimulationAction.setText(tr("Start simulation"));
+	ActionInfo runSimulationActionInfo(&mRunSimulationAction, "generators", "tools");
+	connect(&mRunSimulationAction, SIGNAL(triggered()), this, SLOT(runSimulation()));
+
+	return QList<ActionInfo>() << runBlenderActionInfo << runSimulationActionInfo;
 }
 
 MasterGeneratorBase *MorseGeneratorPlugin::masterGenerator()
@@ -66,16 +87,41 @@ QString MorseGeneratorPlugin::generatorName() const
 	return "Morse";
 }
 
-bool MorseGeneratorPlugin::run3Dmodel()
+void MorseGeneratorPlugin::runBlender()
 {
-	generateCode(false);
-	return true;
+	if (!mMorseAndBlenderPresent) {
+		//mErrorReporter->addInformation(tr("Could not find morse library or correct Blender executable"));
+		return;
+	}
+	if (mBlenderIsRunning) {
+		//mErrorReporter->addInformation(tr("Blender is already being launched"));
+		return;
+	}
+	if (generateCode(false)) {
+		mBlenderIsRunning = true;
+		QFileInfo const fileInfo = srcPath();
+		mBlender.setWorkingDirectory(qApp->applicationDirPath() + "/morse/");
+		mBlender.start(mBlenderLocation + "/blender.exe", QStringList() << qApp->applicationDirPath() + "/morse/share/morse/data/morse_default_autorun.blend"
+					   << "-P" << fileInfo.absolutePath() + "/tempfile.py");
+	}
 }
 
-void MorseGeneratorPlugin::checkMorseAndBlender()
+void MorseGeneratorPlugin::runSimulation()
+{
+	if (!mBlenderIsRunning) {
+		return;
+	}
+	QFileInfo const fileInfo = srcPath();
+	mScript.setWorkingDirectory(qApp->applicationDirPath() + "/morse/");
+	mScript.start("cmd", QStringList() << "/c" << qApp->applicationDirPath() + "/python/python.exe " + fileInfo.absolutePath() + "/govno.py");
+	qDebug() << fileInfo.absolutePath() + "/exe_script.py";
+}
+
+bool MorseGeneratorPlugin::checkMorseAndBlender()
 {
 	bool morsePresent, blenderPresent;
 	QDir dir(qApp->applicationDirPath());
+
 	if (!QDir().exists(dir.absolutePath() + "/morse")) {
 		morsePresent = false;
 	} else {
@@ -85,20 +131,29 @@ void MorseGeneratorPlugin::checkMorseAndBlender()
 		morsePresent = lib.exists() && share.exists();
 	}
 	//TODO: take path to blender.exe from reg
-	//QSettings blenderSettings("HKEY_LOCAL_MACHINE\\SOFTWARE\\BlenderFoundation", QSettings::NativeFormat);
-	QString const blenderLocation = "C:/Program Files (x86)/Blender Foundation/Blender"; //blenderSettings.value("Install_Dir").toString();
+	//QSettings blenderSettings("HKEY_CLASSES_ROOT\\blendfile\\DefaultIcon", QSettings::NativeFormat);
+	QString const blenderLocation = "C:/Program Files/Blender Foundation/Blender";
 	//qDebug() <<  blenderLocation;
 	if (!blenderLocation.isEmpty()) {
-		QString pythonPath = "@@PYTHONPATH@@\DLLs;@@PYTHONPATH@@\lib;@@PYTHONPATH@@;@@PYTHONPATH@@\lib\site-packages;@@MORSEPATH@@\Lib\site-packages";
-		QProcessEnvironment environment(QProcessEnvironment::systemEnvironment());
-		environment.insert("MORSE_BLENDER", blenderLocation + "/blender.exe");
-		environment.insert("MORSE_NODE", "QReal");
-		environment.insert("PYHTONPATH", pythonPath.replace("@@PYTHONPATH@@", "C:/python33").replace(
-							   "@@MORSEPATH@@", qApp->applicationDirPath() + "/morse"));
+		mBlenderLocation = blenderLocation;
 		blenderPresent = true;
 	} else {
 		blenderPresent = false;
 	}
 
 	mMorseAndBlenderPresent = morsePresent && blenderPresent;
+
+	return mMorseAndBlenderPresent;
+}
+
+void MorseGeneratorPlugin::blenderFinished(int exitCode, QProcess::ExitStatus exitStatus)
+{
+	Q_UNUSED(exitStatus)
+	mBlenderIsRunning = false;
+}
+
+void MorseGeneratorPlugin::scriptFinished(int exitCode, QProcess::ExitStatus exitStatus)
+{
+	//Q_UNUSED(exitStatus)
+	qDebug() << exitStatus;
 }

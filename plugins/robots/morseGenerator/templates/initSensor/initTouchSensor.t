@@ -1,4 +1,5 @@
 @@PORT@@ = SickForCollision()
 @@PORT@@.translate(x = 0.7, z = 0.2)
 @@PORT@@.properties(Visible_arc = False)
+@@PORT@@.add_interface('socket')
 robot.append(@@PORT@@)

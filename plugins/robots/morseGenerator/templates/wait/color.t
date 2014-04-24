@@ -1,2 +1,3 @@
-while (ecrobot_get_nxtcolorsensor_id(@@PORT@@) != @@COLOR@@) {
-}
+while read_color_sensor(@@PORT@@) != @@COLOR@@:
+	time.sleep(0.01)
+	pass

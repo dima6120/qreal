@@ -1,6 +1,8 @@
 @@PORT@@ = Sick()
 @@PORT@@.properties(resolution = 1.0)
+@@PORT@@.translate(x=0.7, z=1.0)
 @@PORT@@.properties(scan_window = 60.0)
 @@PORT@@.properties(laser_range = 10)
 @@PORT@@.properties(Visible_arc = True)
+@@PORT@@.add_interface('socket')
 robot.append(@@PORT@@)
