@@ -29,12 +29,13 @@ MorseGeneratorPlugin::MorseGeneratorPlugin()
 		QString pythonPath = "@PYTHONPATH@/DLLs;@PYTHONPATH@/lib;@PYTHONPATH@;@PYTHONPATH@/lib/site-packages;@MORSEPATH@/Lib/site-packages";
 		environment.insert("MORSE_BLENDER", mBlenderLocation + "/blender.exe");
 		environment.insert("MORSE_NODE", "QReal");
-		environment.insert("PYHTONPATH", pythonPath.replace("@@PYTHONPATH@@", qApp->applicationDirPath() + "/python").replace(
-								   "@@MORSEPATH@@", qApp->applicationDirPath() + "/morse"));
+		environment.insert("PYHTONPATH", pythonPath.replace("@PYTHONPATH@", qApp->applicationDirPath() + "/python").replace(
+								   "@MORSEPATH@", qApp->applicationDirPath() + "/morse"));
 		mBlender.setProcessEnvironment(environment);
 		mScript.setProcessEnvironment(environment);
 		connect(&mBlender, SIGNAL(finished(int, QProcess::ExitStatus)), this, SLOT(blenderFinished(int, QProcess::ExitStatus)));
 		connect(&mScript, SIGNAL(finished(int, QProcess::ExitStatus)), this, SLOT(scriptFinished(int, QProcess::ExitStatus)));
+		createEnvironment();
 	}
 }
 
@@ -69,7 +70,8 @@ void MorseGeneratorPlugin::regenerateExtraFiles(QFileInfo const &newFileInfo)
 
 QString MorseGeneratorPlugin::defaultFilePath(QString const &projectName) const
 {
-	return QString("morse/%1/%2.py").arg(projectName, "exe_script");
+	Q_UNUSED(projectName)
+	return QString("morse/3Dmodel/scripts/%1.py").arg("3Dmodel_client");
 }
 
 QString MorseGeneratorPlugin::extension() const
@@ -79,7 +81,7 @@ QString MorseGeneratorPlugin::extension() const
 
 QString MorseGeneratorPlugin::extDescrition() const
 {
-	return tr("Morse Source File");
+	return "";
 }
 
 QString MorseGeneratorPlugin::generatorName() const
@@ -102,7 +104,7 @@ void MorseGeneratorPlugin::runBlender()
 		QFileInfo const fileInfo = srcPath();
 		mBlender.setWorkingDirectory(qApp->applicationDirPath() + "/morse/");
 		mBlender.start(mBlenderLocation + "/blender.exe", QStringList() << qApp->applicationDirPath() + "/morse/share/morse/data/morse_default_autorun.blend"
-					   << "-P" << fileInfo.absolutePath() + "/tempfile.py");
+					   << "-P" << qApp->applicationDirPath() + "/morse/tempfile.py");
 	}
 }
 
@@ -113,8 +115,10 @@ void MorseGeneratorPlugin::runSimulation()
 	}
 	QFileInfo const fileInfo = srcPath();
 	mScript.setWorkingDirectory(qApp->applicationDirPath() + "/morse/");
-	mScript.start("cmd", QStringList() << "/c" << qApp->applicationDirPath() + "/python/python.exe " + fileInfo.absolutePath() + "/govno.py");
-	qDebug() << fileInfo.absolutePath() + "/exe_script.py";
+	mScript.setStandardErrorFile(fileInfo.absolutePath() + "/error.txt");
+	mScript.setStandardOutputFile(fileInfo.absolutePath() + "/out.txt");
+	mScript.start(qApp->applicationDirPath() + "/python/python.exe", QStringList()
+				  << qApp->applicationDirPath() + "/morse/3Dmodel/scripts/3Dmodel_client.py");
 }
 
 bool MorseGeneratorPlugin::checkMorseAndBlender()
@@ -146,14 +150,29 @@ bool MorseGeneratorPlugin::checkMorseAndBlender()
 	return mMorseAndBlenderPresent;
 }
 
+void MorseGeneratorPlugin::createEnvironment()
+{
+	QFile tempfile(qApp->applicationDirPath() + "/morse/tempfile.py");
+	if (tempfile.exists()) {
+		tempfile.remove();
+	}
+	mScript.setWorkingDirectory(qApp->applicationDirPath() + "/morse/");
+	mScript.setStandardErrorFile(qApp->applicationDirPath() + "/morse/error.txt");
+	mScript.setStandardOutputFile(qApp->applicationDirPath() + "/morse/out.txt");
+	mScript.start(qApp->applicationDirPath() + "/python/python.exe", QStringList() << qApp->applicationDirPath() + "/morse/morserun.py"
+				  << "create" << "-f" << "3Dmodel");
+}
+
 void MorseGeneratorPlugin::blenderFinished(int exitCode, QProcess::ExitStatus exitStatus)
 {
 	Q_UNUSED(exitStatus)
+	Q_UNUSED(exitCode)
 	mBlenderIsRunning = false;
+	mScript.kill();
 }
 
 void MorseGeneratorPlugin::scriptFinished(int exitCode, QProcess::ExitStatus exitStatus)
 {
-	//Q_UNUSED(exitStatus)
-	qDebug() << exitStatus;
+	Q_UNUSED(exitStatus)
+	qDebug() << exitCode;
 }

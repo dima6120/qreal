@@ -21,7 +21,7 @@ qReal::robots::generators::GeneratorCustomizer *MorseMasterGenerator::createCust
 
 QString MorseMasterGenerator::targetPath()
 {
-	return QString("%1/%2.py").arg(mProjectDir, "exe_script");
+	return QString("%1/%2.py").arg(mProjectDir, "3Dmodel_client");
 }
 
 bool MorseMasterGenerator::supportsGotoGeneration() const
@@ -38,18 +38,17 @@ void MorseMasterGenerator::afterGeneration()
 void MorseMasterGenerator::generateTempfile(QString const &projectDir)
 {
 	QString tempfile = readTemplate("tempfile.t");
-	tempfile.replace("@@BUILDERSCRIPT@@", projectDir + "/build_script.py");
+	tempfile.replace("@@BUILDERSCRIPT@@", qApp->applicationDirPath() + "/morse/3Dmodel/default.py");
 	tempfile.replace("@@MORSEROOT@@", qApp->applicationDirPath() + "/morse");
 	tempfile.replace("@@PYTHONDIR@@", qApp->applicationDirPath() + "/python");
-	outputCode(projectDir + "/tempfile.py", tempfile);
+	outputCode(qApp->applicationDirPath() + "/morse/tempfile.py", tempfile);
 }
 
 void MorseMasterGenerator::generateBuildScriptAndExtraCode(QString const &projectDir)
 {
 	QString init_sensors = "";
-	QString read_functions = "";
 	QString get_sensors = "";
-	QFile file(projectDir + "/exe_script.py");
+	QFile file(projectDir + "/3Dmodel_client.py");
 	QTextStream *inStream = 0;
 	if (!file.isOpen() && file.open(QIODevice::ReadOnly | QIODevice::Text)) {
 			inStream = new QTextStream(&file);
@@ -90,12 +89,12 @@ void MorseMasterGenerator::generateBuildScriptAndExtraCode(QString const &projec
 	}
 	// TODO: set chousen environment
 	QString const build_code = readTemplate("build.t").replace("@@INITSENSORS@@", init_sensors).replace(
-				"@@ENVIRONMENT@@", qApp->applicationDirPath() + "/morse/share/morse/data/environments/sandbox.blend");
-	outputCode(projectDir + "/build_script.py", build_code);
+				"@@ENVIRONMENT@@", qApp->applicationDirPath() + "/morse/share/morse/data/environments/test.blend");
+	outputCode(qApp->applicationDirPath() + "/morse/3Dmodel/default.py", build_code);
 
 	if (inStream) {
-		QString const code = inStream->readAll().replace("@@READFUNCTIONS@@", read_functions).replace(
-					"@@GETSENSORS@@", get_sensors);
-		outputCode(projectDir + "/exe_script.py", code);
+		QString const code = inStream->readAll().replace("@@GETSENSORS@@", get_sensors)
+				.replace("@@MORSEROOT@@", qApp->applicationDirPath() + "/morse");
+		outputCode(projectDir + "/3Dmodel_client.py", code);
 	}
 }

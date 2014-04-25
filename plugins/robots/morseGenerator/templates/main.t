@@ -1,5 +1,8 @@
 import time
 import sys
+
+sys.path.append('@@MORSEROOT@@/Lib/site-packages')
+
 import random
 from consts import *
 from readfunctions import *

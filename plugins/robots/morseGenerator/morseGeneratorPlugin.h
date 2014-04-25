@@ -37,6 +37,7 @@ private:
 	QString extDescrition() const override;
 	QString generatorName() const override;
 	bool checkMorseAndBlender();
+	void createEnvironment();
 
 	QAction mRunBlenderAction;
 	QAction mRunSimulationAction;
