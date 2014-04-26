@@ -48,11 +48,15 @@ void MorseMasterGenerator::generateBuildScriptAndExtraCode(QString const &projec
 {
 	QString init_sensors = "";
 	QString get_sensors = "";
+	QString init_sensor = "";
 	QFile file(projectDir + "/3Dmodel_client.py");
 	QTextStream *inStream = 0;
 	if (!file.isOpen() && file.open(QIODevice::ReadOnly | QIODevice::Text)) {
 			inStream = new QTextStream(&file);
 	}
+
+	double const portCoord[4][3] = {{1.0, 0.0, 1.0}, {0.0, 1.0, 1.0}
+								   , {-1.0, 0.0, 1.0}, {0.0, -1.0, 1.0}};
 
 	for(int port = 1; port <= 4; ++port) {
 		QString const portString = QString::number(port);
@@ -83,9 +87,14 @@ void MorseMasterGenerator::generateBuildScriptAndExtraCode(QString const &projec
 			default:
 				continue;
 		}
-
 		get_sensors += readTemplate("getSensor.t").replace("@@PORT@@", "port" + portString) + "\n";
-		init_sensors += readTemplate(ist_path).replace("@@PORT@@", "port" + portString) + "\n";
+
+		init_sensor = readTemplate(ist_path).replace("@@PORT@@", "port" + portString);
+		init_sensor.replace("@@X@@", QString::number(portCoord[port - 1][0]));
+		init_sensor.replace("@@Y@@", QString::number(portCoord[port - 1][1]));
+		init_sensor.replace("@@Z@@", QString::number(portCoord[port - 1][2]));
+
+		init_sensors += init_sensor + "\n";
 	}
 	// TODO: set chousen environment
 	QString const build_code = readTemplate("build.t").replace("@@INITSENSORS@@", init_sensors).replace(

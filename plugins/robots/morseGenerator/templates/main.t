@@ -14,6 +14,7 @@ except ImportError:
     sys.exit(1)
 	
 isUsed = [False, False, False]
+color = {}
 LPower = 0
 RPower = 0
 
@@ -80,6 +81,8 @@ motion = simu.robot.motion
 @@VARIABLES@@
 
 @@SUBPROGRAMS@@
+
+@@INITHOOKS@@
 
 #Main task
 def main():

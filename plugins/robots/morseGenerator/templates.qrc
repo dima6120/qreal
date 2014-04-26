@@ -78,11 +78,16 @@
         <file>templates/variables/intVariableDeclaration.t</file>
         <file>templates/whatTime.t</file>
         <file>templates/sensors/readColorRecognition.t</file>
-	<file>templates/getSensor.t</file>
-	<file>templates/initSensor/initSonarSensor.t</file>
-	<file>templates/initSensor/initTouchSensor.t</file>
-	<file>templates/initSensor/initColorLightSensor.t</file>
-	<file>templates/build.t</file>
-	<file>templates/tempfile.t</file>
+        <file>templates/getSensor.t</file>
+        <file>templates/initSensor/initSonarSensor.t</file>
+        <file>templates/initSensor/initTouchSensor.t</file>
+        <file>templates/initSensor/initColorLightSensor.t</file>
+        <file>templates/build.t</file>
+        <file>templates/tempfile.t</file>
+        <file>templates/initialization/colorBlue.t</file>
+        <file>templates/initialization/colorFull.t</file>
+        <file>templates/initialization/colorGreen.t</file>
+        <file>templates/initialization/colorNone.t</file>
+        <file>templates/initialization/colorRed.t</file>
     </qresource>
 </RCC>

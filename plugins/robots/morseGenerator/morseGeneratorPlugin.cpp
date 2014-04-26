@@ -16,7 +16,7 @@ using namespace morse;
 MorseGeneratorPlugin::MorseGeneratorPlugin()
 	: mRunBlenderAction(nullptr)
 	, mRunSimulationAction(nullptr)
-	//, mErrorReporter(mMainWindowInterface->errorReporter())
+	, mStopSimulationAction(nullptr)
 	, mMorseAndBlenderPresent(false)
 	, mBlenderIsRunning(false)
 	, mBlenderLocation("")
@@ -53,8 +53,14 @@ QList<ActionInfo> MorseGeneratorPlugin::actions()
 	ActionInfo runSimulationActionInfo(&mRunSimulationAction, "generators", "tools");
 	connect(&mRunSimulationAction, SIGNAL(triggered()), this, SLOT(runSimulation()));
 
-	return QList<ActionInfo>() << runBlenderActionInfo << runSimulationActionInfo;
+	mStopSimulationAction.setText(tr("Stop simulation"));
+	ActionInfo stopSimulationActionInfo(&mStopSimulationAction, "generators", "tools");
+	connect(&mStopSimulationAction, SIGNAL(triggered()), this, SLOT(stopSimulation()));
+
+
+	return QList<ActionInfo>() << runBlenderActionInfo << runSimulationActionInfo << stopSimulationActionInfo;
 }
+
 
 MasterGeneratorBase *MorseGeneratorPlugin::masterGenerator()
 {
@@ -92,16 +98,15 @@ QString MorseGeneratorPlugin::generatorName() const
 void MorseGeneratorPlugin::runBlender()
 {
 	if (!mMorseAndBlenderPresent) {
-		//mErrorReporter->addInformation(tr("Could not find morse library or correct Blender executable"));
+		mMainWindowInterface->errorReporter()->addInformation(tr("Could not find morse library or correct Blender executable"));
 		return;
 	}
 	if (mBlenderIsRunning) {
-		//mErrorReporter->addInformation(tr("Blender is already being launched"));
+		mMainWindowInterface->errorReporter()->addInformation(tr("Blender is already being launched"));
 		return;
 	}
 	if (generateCode(false)) {
 		mBlenderIsRunning = true;
-		QFileInfo const fileInfo = srcPath();
 		mBlender.setWorkingDirectory(qApp->applicationDirPath() + "/morse/");
 		mBlender.start(mBlenderLocation + "/blender.exe", QStringList() << qApp->applicationDirPath() + "/morse/share/morse/data/morse_default_autorun.blend"
 					   << "-P" << qApp->applicationDirPath() + "/morse/tempfile.py");
@@ -111,14 +116,22 @@ void MorseGeneratorPlugin::runBlender()
 void MorseGeneratorPlugin::runSimulation()
 {
 	if (!mBlenderIsRunning) {
+		mMainWindowInterface->errorReporter()->addInformation(tr("First run 3D model"));
 		return;
 	}
+	mMainWindowInterface->errorReporter()->addInformation(tr("Simulation is running"));
 	QFileInfo const fileInfo = srcPath();
 	mScript.setWorkingDirectory(qApp->applicationDirPath() + "/morse/");
 	mScript.setStandardErrorFile(fileInfo.absolutePath() + "/error.txt");
 	mScript.setStandardOutputFile(fileInfo.absolutePath() + "/out.txt");
 	mScript.start(qApp->applicationDirPath() + "/python/python.exe", QStringList()
 				  << qApp->applicationDirPath() + "/morse/3Dmodel/scripts/3Dmodel_client.py");
+}
+
+void MorseGeneratorPlugin::stopSimulation()
+{
+	mScript.kill();
+	mMainWindowInterface->errorReporter()->addInformation(tr("Simulation is stopped"));
 }
 
 bool MorseGeneratorPlugin::checkMorseAndBlender()

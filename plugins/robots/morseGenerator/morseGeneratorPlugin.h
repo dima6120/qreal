@@ -26,6 +26,7 @@ public:
 private slots:
 	void runBlender();
 	void runSimulation();
+	void stopSimulation();
 	void blenderFinished(int exitCode, QProcess::ExitStatus exitStatus);
 	void scriptFinished(int exitCode, QProcess::ExitStatus exitStatus);
 
@@ -41,8 +42,7 @@ private:
 
 	QAction mRunBlenderAction;
 	QAction mRunSimulationAction;
-
-	//qReal::ErrorReporterInterface *mErrorReporter;
+	QAction mStopSimulationAction;
 
 	/// When true, Morse and Blender required version are found by QReal and using 3D model is possible
 	bool mMorseAndBlenderPresent;
