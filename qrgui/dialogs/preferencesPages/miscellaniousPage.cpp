@@ -14,6 +14,7 @@ PreferencesMiscellaniousPage::PreferencesMiscellaniousPage(QWidget *parent)
 	mUi->setupUi(this);
 
 	connect(mUi->imagesPathBrowseButton, SIGNAL(clicked()), this, SLOT(browseImagesPath()));
+	connect(mUi->blenderPathBrowseButton, SIGNAL(clicked()), this, SLOT(browseBlenderPath()));
 	connect(mUi->toolbarSizeSlider, &QSlider::valueChanged, this, &PreferencesMiscellaniousPage::toolbarSizeChanged);
 
 	mUi->colorComboBox->addItems(QColor::colorNames());
@@ -46,6 +47,15 @@ void PreferencesMiscellaniousPage::browseImagesPath()
 	}
 }
 
+void PreferencesMiscellaniousPage::browseBlenderPath()
+{
+	QString const path = utils::QRealFileDialog::getExistingDirectory("OpenBlenderPathOnMiscellaniousPage"
+			, this, tr("Open Directory")).replace("\\", "/");
+	if (!path.isEmpty()) {
+		mUi->blenderPathEdit->setText(path);
+	}
+}
+
 void PreferencesMiscellaniousPage::save()
 {
 	SettingsManager::setValue("Splashscreen", mUi->splashScreenCheckBox->isChecked());
@@ -57,6 +67,7 @@ void PreferencesMiscellaniousPage::save()
 	SettingsManager::setValue("oldLineColor", mUi->colorComboBox->currentText());
 
 	SettingsManager::setValue("toolbarSize", mUi->toolbarSizeSlider->value());
+	SettingsManager::setValue("BlenderPath", mUi->blenderPathEdit->text());
 
 	if (mLastIconsetPath != mUi->imagesPathEdit->text()) {
 		emit iconsetChanged();
@@ -78,4 +89,5 @@ void PreferencesMiscellaniousPage::restoreSettings()
 
 	mLastIconsetPath = SettingsManager::value("pathToImages").toString();
 	mUi->imagesPathEdit->setText(mLastIconsetPath);
+	mUi->blenderPathEdit->setText(SettingsManager::value("BlenderPath").toString());
 }

@@ -14,6 +14,8 @@ public:
 			, ErrorReporterInterface &errorReporter
 			, Id const &diagramId);
 
+	void generateBuildScript();
+
 protected:
 	GeneratorCustomizer *createCustomizer() override;
 	QString targetPath() override;
@@ -21,8 +23,9 @@ protected:
 	void afterGeneration() override;
 
 private:
-	void generateBuildScriptAndExtraCode(QString const &projectDir);
-	void generateTempfile(QString const &projectDir);
+	//void generateBuildScriptAndExtraCode(QString const &projectDir);
+	void generateExtraCode();
+	void generateTempfile();
 };
 
 }

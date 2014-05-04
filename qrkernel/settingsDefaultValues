@@ -74,3 +74,4 @@ robotsInterpreterStackSize=4000
 usabilityTestingMode=false
 collectErgonomicValues=truenxtFlashToolRunPolicy=0
 touchMode=false
+BlenderPath=

@@ -26,6 +26,7 @@ protected:
 
 private slots:
 	void browseImagesPath();
+	void browseBlenderPath();
 
 private:
 	Ui::PreferencesMiscellaniousPage *mUi;

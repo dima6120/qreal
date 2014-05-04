@@ -28,7 +28,6 @@ private slots:
 	void runSimulation();
 	void stopSimulation();
 	void blenderFinished(int exitCode, QProcess::ExitStatus exitStatus);
-	void scriptFinished(int exitCode, QProcess::ExitStatus exitStatus);
 
 private:
 	MasterGeneratorBase *masterGenerator() override;
@@ -37,8 +36,13 @@ private:
 	QString extension() const override;
 	QString extDescrition() const override;
 	QString generatorName() const override;
-	bool checkMorseAndBlender();
-	void createEnvironment();
+	bool checkMorse();
+	bool checkBlender();
+	void checkMorseAndBlender();
+	bool checkBlenderVersion();
+	void createMorseEnvironment();
+	void readBlenderVersionRestriction();
+	void setProcessEnviroment();
 
 	QAction mRunBlenderAction;
 	QAction mRunSimulationAction;
@@ -46,7 +50,12 @@ private:
 
 	/// When true, Morse and Blender required version are found by QReal and using 3D model is possible
 	bool mMorseAndBlenderPresent;
+
 	bool mBlenderIsRunning;
+	bool mScriptIsRunning;
+
+	QString mMinBlenderVersion;
+	QString mStrictMaxBlenderVersion;
 
 	QString mBlenderLocation;
 

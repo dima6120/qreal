@@ -82,10 +82,13 @@ motion = simu.robot.motion
 
 @@SUBPROGRAMS@@
 
+def initialization():
+	global color
 @@INITHOOKS@@
 
 #Main task
 def main():
 @@MAIN_CODE@@
 
+initialization()
 main()
