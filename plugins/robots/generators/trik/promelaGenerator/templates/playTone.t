@@ -1,0 +1,1 @@
+skip; /* play sound (@@FILENAME@@) */

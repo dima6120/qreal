@@ -1,0 +1,104 @@
+active proctype setProcess()
+{
+end_setProgress:	do
+					::atomic {
+								/*sensors*/
+								if
+								::portA1 = triggered;
+								::portA1 = not_triggered;
+								fi;
+								if
+								::portA2 = triggered;
+								::portA2 = not_triggered;
+								fi;
+								if
+								::portA3 = triggered;
+								::portA3 = not_triggered;
+								fi;
+								if
+								::portA4 = triggered;
+								::portA4 = not_triggered;
+								fi;
+								if
+								::portA5 = triggered;
+								::portA5 = not_triggered;
+								fi;
+								if
+								::portA6 = triggered;
+								::portA6 = not_triggered;
+								fi;
+								
+								/*buttons*/
+								if
+								::keyDown = pressed;
+								::keyDown = not_pressed;
+								fi;
+								if
+								::keyUp = pressed;
+								::keyUp = not_pressed;
+								fi;
+								if
+								::keyLeft = pressed;
+								::keyLeft = not_pressed;
+								fi;
+								if
+								::keyRight = pressed;
+								::keyRight = not_pressed;
+								fi;
+								if
+								::keyEsc = pressed;
+								::keyEsc = not_pressed;
+								fi;
+								if
+								::keyEnter = pressed;
+								::keyEnter = not_pressed;
+								fi;
+								
+								/*gamepad*/
+								if
+								::gamepadButton1 = pressed;
+								::gamepadButton1 = not_pressed;
+								fi;
+								if
+								::gamepadButton2 = pressed;
+								::gamepadButton2 = not_pressed;
+								fi;
+								if
+								::gamepadButton3 = pressed;
+								::gamepadButton3 = not_pressed;
+								fi;
+								if
+								::gamepadButton4 = pressed;
+								::gamepadButton4 = not_pressed;
+								fi;
+								if
+								::gamepadButton5 = pressed;
+								::gamepadButton5 = not_pressed;
+								fi;
+								if
+								::gamepadWheelState = rotated;
+								::gamepadWheelState = not_rotated;
+								fi;
+								if 
+								::gamepadArea1 = pressed;
+								::gamepadArea1 = not_pressed;
+								fi;
+								if 
+								::gamepadArea2 = pressed;
+								::gamepadArea2 = not_pressed;
+								fi;
+								if
+								::gamepadStatus = connected;
+								::gamepadStatus = disconnected;
+								  gamepadButton1 = not_pressed;
+								  gamepadButton2 = not_pressed;
+								  gamepadButton3 = not_pressed;
+								  gamepadButton4 = not_pressed;
+								  gamepadButton5 = not_pressed;
+								  gamepadArea1 = not_pressed
+								  gamepadArea2 = not_pressed;
+								  gamepadWheelState = not_rotated;
+								fi;
+							}
+					od;	
+}

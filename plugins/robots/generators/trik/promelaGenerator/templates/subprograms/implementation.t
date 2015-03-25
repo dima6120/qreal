@@ -1,0 +1,4 @@
+inline @@NAME@@()
+{
+	@@BODY@@
+}
