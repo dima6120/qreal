@@ -1,0 +1,1 @@
+ledColor = @@COLOR@@;

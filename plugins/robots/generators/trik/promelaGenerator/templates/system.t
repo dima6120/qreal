@@ -1,0 +1,1 @@
+skip; /*script.system(@@COMMAND@@);*/

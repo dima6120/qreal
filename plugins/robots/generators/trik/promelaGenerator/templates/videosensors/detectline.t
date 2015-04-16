@@ -1,0 +1,1 @@
+skip; /*video sensor: detect line*/

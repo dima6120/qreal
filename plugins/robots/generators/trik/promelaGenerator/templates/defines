@@ -1,0 +1,50 @@
+mtype = {
+/*sensors*/
+triggered, not_triggered,
+/*buttons*/
+pressed, not_pressed,
+/*gamepad status*/
+connected, disconnected,
+/*gamepad wheel state*/
+rotated, not_rotated,
+/*motor state*/
+backward, forward, stop,
+/*led color*/
+green, orange, red, off
+}
+
+mtype portA1 = not_triggered;
+mtype portA2 = not_triggered;
+mtype portA3 = not_triggered;
+mtype portA4 = not_triggered;
+mtype portA5 = not_triggered;
+mtype portA6 = not_triggered;
+mtype portD1 = not_triggered;
+mtype portD2 = not_triggered;
+mtype portF1 = not_triggered;
+
+mtype keyDown = not_pressed;
+mtype keyUp = not_pressed;
+mtype keyLeft = not_pressed;
+mtype keyRight = not_pressed;
+mtype keyEsc = not_pressed;
+mtype keyEnter = not_pressed;
+
+mtype gamepadButton1 = not_pressed;
+mtype gamepadButton2 = not_pressed;
+mtype gamepadButton3 = not_pressed;
+mtype gamepadButton4 = not_pressed;
+mtype gamepadButton5 = not_pressed;
+
+mtype gamePadArea1 = not_pressed;
+mtype gamePadArea2 = not_pressed;
+
+mtype gamepadStatus = disconnected;
+mtype gamepadWheelState = not_rotated;
+
+mtype motorM1 = stop;
+mtype motorM2 = stop;
+mtype motorM3 = stop;
+mtype motorM4 = stop;
+
+mtype ledColor = off;

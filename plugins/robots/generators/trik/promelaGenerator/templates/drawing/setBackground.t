@@ -1,0 +1,1 @@
+skip;/*set background ("@@COLOR@@")*/
