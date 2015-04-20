@@ -16,10 +16,12 @@
 
 #include <generatorBase/generatorFactoryBase.h>
 
+#include "trikGeneratorBase/trikGeneratorBaseDeclSpec.h"
+
 namespace trik {
 
 /// Generator factory implemtation for TRIK platform
-class TrikGeneratorFactory : public generatorBase::GeneratorFactoryBase
+class ROBOTS_TRIK_GENERATOR_BASE_EXPORT TrikGeneratorFactory : public generatorBase::GeneratorFactoryBase
 {
 public:
 	TrikGeneratorFactory(const qrRepo::RepoApi &repo

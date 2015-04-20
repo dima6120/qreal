@@ -1,1 +1,3 @@
-if /*switch(@@EXPRESSION@@)
+if
+@@CONDITION@@
+@@BODY@@

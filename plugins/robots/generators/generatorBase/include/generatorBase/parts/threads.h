@@ -63,6 +63,8 @@ public:
 	/// Generates and returns the code of the section with threads code.
 	QString generateImplementations(const QString &indentString) const;
 
+	QString blockThreadId(const qReal::Id &id);
+
 private:
 	QString name(const semantics::SemanticTree *tree) const;
 

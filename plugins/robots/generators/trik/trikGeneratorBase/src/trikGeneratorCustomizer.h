@@ -16,7 +16,7 @@
 
 #include <generatorBase/generatorCustomizer.h>
 
-#include "trikGeneratorFactory.h"
+#include "trikGeneratorBase/trikGeneratorFactory.h"
 
 namespace trik {
 

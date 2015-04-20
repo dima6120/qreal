@@ -1,3 +1,3 @@
-::
-	@@BODY@@
+::else ->
+@@BODY@@
 fi;

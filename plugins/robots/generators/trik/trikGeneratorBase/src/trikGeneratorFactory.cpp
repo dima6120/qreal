@@ -12,7 +12,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License. */
 
-#include "trikGeneratorFactory.h"
+#include "trikGeneratorBase/trikGeneratorFactory.h"
 
 #include <generatorBase/converters/regexpMultiConverter.h>
 #include <generatorBase/simpleGenerators/waitForButtonGenerator.h>

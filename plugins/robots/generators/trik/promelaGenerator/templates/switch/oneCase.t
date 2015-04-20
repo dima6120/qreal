@@ -1,1 +1,1 @@
-:: /*@@VALUE@@*/
+::(@@EXPRESSION@@ == @@VALUE@@) ->

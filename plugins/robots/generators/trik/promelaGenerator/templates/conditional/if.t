@@ -1,5 +1,5 @@
-if /*(@@CONDITION@@)*/ 
-:: 
-	@@THEN_BODY@@
-:: skip
+if 
+:: @@CONDITION@@ ->
+@@THEN_BODY@@
+:: else -> skip
 fi;

@@ -199,5 +199,10 @@
         <file>templates/luaPrinting/true.t</file>
         <file>templates/luaPrinting/unaryMinus.t</file>
         <file>templates/system.t</file>
+        <file>templates/defineProcessId.t</file>
+        <file>templates/threads/join.t</file>
+        <file>templates/threads/receiveMessage.t</file>
+        <file>templates/threads/sendMessage.t</file>
+        <file>templates/defineProcessChannels.t</file>
     </qresource>
 </RCC>

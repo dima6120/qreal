@@ -117,6 +117,16 @@ QString Threads::generateImplementations(const QString &indentString) const
 	return implementationsHeader + implementations.join("\n");
 }
 
+QString Threads::blockThreadId(const qReal::Id &id)
+{
+	for (semantics::SemanticTree *tree : threads()) {
+		if (tree->findNodeFor(id)) {
+			return threadId(tree->initialBlock());
+		}
+	}
+	return QString();
+}
+
 QString Threads::name(const semantics::SemanticTree *tree) const
 {
 	return utils::NameNormalizer::normalizeStrongly(tree->initialBlock().id(), false);

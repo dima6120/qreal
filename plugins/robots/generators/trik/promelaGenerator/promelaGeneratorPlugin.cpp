@@ -12,7 +12,8 @@ using namespace trik::promela;
 using namespace qReal;
 
 PromelaGeneratorPlugin::PromelaGeneratorPlugin()
-	: mGenerateCodeAction(new QAction(nullptr))
+	: TrikGeneratorPluginBase("PromelaGeneratorRobotModel", tr("Generation (Promela)"), 7 /* Last order */)
+	, mGenerateCodeAction(new QAction(nullptr))
 {
 }
 
@@ -25,7 +26,7 @@ void PromelaGeneratorPlugin::init(kitBase::KitPluginConfigurator const &configur
 	RobotsGeneratorPluginBase::init(configurator);
 }
 
-QList<ActionInfo> PromelaGeneratorPlugin::actions()
+QList<ActionInfo> PromelaGeneratorPlugin::customActions()
 {
 	QAction *separator = new QAction(this);
 	separator->setSeparator(true);
@@ -46,6 +47,12 @@ QList<HotKeyActionInfo> PromelaGeneratorPlugin::hotKeyActions()
 	HotKeyActionInfo generateCodeInfo("Generator.GeneratePromela", tr("Generate Promela Code"), mGenerateCodeAction);
 
 	return { generateCodeInfo };
+}
+
+QIcon PromelaGeneratorPlugin::iconForFastSelector(const kitBase::robotModel::RobotModelInterface &robotModel) const
+{
+	Q_UNUSED(robotModel)
+	return QIcon(":/trik/qts/images/switch-to-trik-qts.svg");
 }
 
 generatorBase::MasterGeneratorBase *PromelaGeneratorPlugin::masterGenerator()
