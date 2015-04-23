@@ -16,6 +16,7 @@
 
 #include "generatorBase/controlFlowGeneratorBase.h"
 
+using namespace generatorBase;
 using namespace generatorBase::parts;
 using namespace qReal;
 
@@ -50,11 +51,30 @@ void Subprograms::appendManualSubprogram(const QString &name, const QString &bod
 	mManualDeclarations[name] = body;
 }
 
-void Subprograms::usageFound(const Id &logicalId)
+ControlFlowGeneratorBase *Subprograms::currentControlFlow()
+{
+	return mCurrentControlFlow;
+}
+
+void Subprograms::setCurrentControlFlow(ControlFlowGeneratorBase *controlFlow)
+{
+	mCurrentControlFlow = controlFlow;
+}
+
+void Subprograms::usageFound(const Id &logicalId, const QString &threadId)
 {
 	const Id diagram = mRepo.outgoingExplosion(logicalId);
-	if (diagram != Id() && !mDiscoveredSubprograms.contains(diagram)) {
-		mDiscoveredSubprograms[diagram] = false;
+	if (diagram != Id()) {
+		if (!mDiscoveredSubprograms.contains(diagram)) {
+			mDiscoveredSubprograms[diagram] = QPair<bool, int> (false, 1);
+			mUsedCalls.insert(logicalId);
+			mSubprogramThread[diagram] = threadId;
+		} else {
+			if (!mUsedCalls.contains(logicalId)) {
+				mDiscoveredSubprograms[diagram].second++;
+				mUsedCalls.insert(logicalId);
+			}
+		}
 	}
 }
 
@@ -65,7 +85,7 @@ bool Subprograms::generate(ControlFlowGeneratorBase *mainGenerator, const QStrin
 
 	Id toGen = firstToGenerate();
 	while (toGen != Id()) {
-		mDiscoveredSubprograms[toGen] = true;
+		mDiscoveredSubprograms[toGen].first = true;
 
 		const Id graphicalDiagramId = graphicalId(toGen);
 		if (graphicalDiagramId.isNull()) {
@@ -80,7 +100,8 @@ bool Subprograms::generate(ControlFlowGeneratorBase *mainGenerator, const QStrin
 		}
 
 		ControlFlowGeneratorBase *generator = mainGenerator->cloneFor(graphicalDiagramId, true);
-		semantics::SemanticTree *controlFlow = generator->generate(Id(), "@@unknown@@");
+		semantics::SemanticTree *controlFlow = generator->generate(Id()
+				, mDiscoveredSubprograms[toGen].second == 1 ? mSubprogramThread[toGen] : "@@unknown@@");
 		if (!controlFlow) {
 			return false;
 		}
@@ -167,7 +188,7 @@ bool Subprograms::checkIdentifier(const QString &identifier, const QString &rawN
 Id Subprograms::firstToGenerate() const
 {
 	foreach (const Id &id, mDiscoveredSubprograms.keys()) {
-		if (!mDiscoveredSubprograms[id]) {
+		if (!mDiscoveredSubprograms[id].first) {
 			return id;
 		}
 	}

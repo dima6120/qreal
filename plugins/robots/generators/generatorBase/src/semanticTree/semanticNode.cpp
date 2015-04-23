@@ -13,6 +13,8 @@
  * limitations under the License. */
 
 #include "generatorBase/semanticTree/semanticNode.h"
+#include "generatorBase/parts/subprograms.h"
+
 
 #include <qrutils/stringUtils.h>
 

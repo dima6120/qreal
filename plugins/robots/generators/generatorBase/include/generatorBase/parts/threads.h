@@ -51,6 +51,8 @@ public:
 	/// Returns a list of thread names on all diagrams of the model.
 	QStringList threadNames() const;
 
+	QList<QString> threadIds() const;
+
 	/// Adds a thread to a join point.
 	void addJoin(const qReal::Id &id, const QString &threadId);
 
@@ -62,8 +64,6 @@ public:
 
 	/// Generates and returns the code of the section with threads code.
 	QString generateImplementations(const QString &indentString) const;
-
-	QString blockThreadId(const qReal::Id &id);
 
 private:
 	QString name(const semantics::SemanticTree *tree) const;

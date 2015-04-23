@@ -24,6 +24,7 @@
 #include "generatorBase/robotsGeneratorDeclSpec.h"
 #include "generatorBase/templateParametrizedEntity.h"
 #include "generatorBase/simpleGenerators/binding.h"
+#include "generatorBase/controlFlowGeneratorBase.h"
 
 namespace generatorBase {
 
@@ -46,7 +47,7 @@ public:
 
 	/// Must be called each time when visitor has found subprogram call
 	/// @param logicalId Logical id of the block which calls subprogram
-	void usageFound(const qReal::Id &logicalId);
+	void usageFound(const qReal::Id &logicalId, const QString &threadId);
 
 	/// Starts subprograms code generation process
 	bool generate(ControlFlowGeneratorBase *mainGenerator, const QString &indentString);
@@ -58,6 +59,9 @@ public:
 	QString implementations() const;
 
 	void appendManualSubprogram(const QString &name, const QString &body);
+
+	generatorBase::ControlFlowGeneratorBase *currentControlFlow();
+	void setCurrentControlFlow(generatorBase::ControlFlowGeneratorBase *controlFlow);
 
 private:
 	bool checkIdentifier(const QString &identifier, const QString &rawName);
@@ -80,8 +84,14 @@ private:
 
 	/// Stores all found by generator diagrams with subprograms implementation.
 	/// Bool value means if key diagram was already processed and generated into
-	/// the code.
-	QMap<qReal::Id, bool> mDiscoveredSubprograms;
+	/// the code. Int value means the number of subprogram calls.
+	QMap<qReal::Id, QPair<bool, int> > mDiscoveredSubprograms;
+
+	/// Stores all found subprogram calls which was found.
+	QSet<qReal::Id> mUsedCalls;
+
+	/// Stores Id of a thread in which subprogram was called. Its true only if subprogram was called once.
+	QMap<qReal::Id, QString> mSubprogramThread;
 
 	QStringList mImplementationsCode;
 	QStringList mForwardDeclarationsCode;
@@ -89,6 +99,9 @@ private:
 	QSet<QString> mUsedNames;
 
 	QMap<QString, QString> mManualDeclarations;
+
+	/// Currently generated control flow
+	generatorBase::ControlFlowGeneratorBase *mCurrentControlFlow;
 };
 
 }

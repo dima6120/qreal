@@ -1,7 +1,7 @@
 #include "receiveMessageThreadsGenerator.h"
 
 #include <generatorBase/generatorCustomizer.h>
-#include <generatorBase/parts/threads.h>
+#include <generatorBase/parts/subprograms.h>
 #include <qrkernel/ids.h>
 
 
@@ -17,7 +17,7 @@ ReceiveMessageThreadsGenerator::ReceiveMessageThreadsGenerator(const qrRepo::Rep
 					, "Variable"
 					, customizer.factory()->functionBlockConverter(id, "Variable"))
 				, Binding::createStatic("@@RECEIVER@@"
-						, customizer.factory()->threads().blockThreadId(id))
+						, customizer.factory()->subprograms()->currentControlFlow()->threadId())
 				, Binding::createStatic("@@SENDER@@", repo.stringProperty(repo.outgoingLinks(id).at(0)
 						, "Guard"))
 				}

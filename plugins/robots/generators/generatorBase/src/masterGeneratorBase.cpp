@@ -86,6 +86,7 @@ QString MasterGeneratorBase::generate(const QString &indentString)
 
 	QString mainCode;
 	const semantics::SemanticTree *mainControlFlow = mReadableControlFlowGenerator->generate();
+
 	if (mainControlFlow && !mReadableControlFlowGenerator->cantBeGeneratedIntoStructuredCode()) {
 		mainCode = mainControlFlow->toString(1, indentString);
 		const bool subprogramsResult = mCustomizer->factory()->subprograms()->generate(mReadableControlFlowGenerator

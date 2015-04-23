@@ -72,6 +72,11 @@ QStringList Threads::threadNames() const
 	return result;
 }
 
+QList<QString> Threads::threadIds() const
+{
+	return mThreadIds.values();
+}
+
 void Threads::addJoin(const qReal::Id &id, const QString &threadId)
 {
 	mJoins[id] << threadId;
@@ -115,16 +120,6 @@ QString Threads::generateImplementations(const QString &indentString) const
 	}
 
 	return implementationsHeader + implementations.join("\n");
-}
-
-QString Threads::blockThreadId(const qReal::Id &id)
-{
-	for (semantics::SemanticTree *tree : threads()) {
-		if (tree->findNodeFor(id)) {
-			return threadId(tree->initialBlock());
-		}
-	}
-	return QString();
 }
 
 QString Threads::name(const semantics::SemanticTree *tree) const

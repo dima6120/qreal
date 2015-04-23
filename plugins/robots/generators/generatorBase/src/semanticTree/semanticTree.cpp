@@ -17,6 +17,8 @@
 #include "generatorBase/semanticTree/simpleNode.h"
 #include "generatorBase/semanticTree/ifNode.h"
 #include "generatorBase/semanticTree/loopNode.h"
+#include "generatorBase/parts/subprograms.h"
+#include "generatorBase/controlFlowGeneratorBase.h"
 
 using namespace generatorBase::semantics;
 using namespace qReal;
@@ -37,6 +39,8 @@ Id SemanticTree::initialBlock() const
 
 QString SemanticTree::toString(int indent, const QString &indentString) const
 {
+	mCustomizer.factory()->subprograms()->setCurrentControlFlow(
+			dynamic_cast<generatorBase::ControlFlowGeneratorBase *> (parent()));
 	return mRoot->toString(mCustomizer, indent, indentString);
 }
 

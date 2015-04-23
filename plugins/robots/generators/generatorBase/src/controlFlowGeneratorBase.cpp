@@ -117,7 +117,7 @@ void ControlFlowGeneratorBase::visitRegular(const Id &id, const QList<LinkInfo> 
 {
 	Q_UNUSED(links)
 	if (mCustomizer.isSubprogramCall(id)) {
-		mCustomizer.factory()->subprograms()->usageFound(id);
+		mCustomizer.factory()->subprograms()->usageFound(id, mThreadId);
 	}
 }
 
@@ -188,4 +188,9 @@ void ControlFlowGeneratorBase::visitJoin(const Id &id, QList<LinkInfo> &links)
 		links.clear();
 		visitFinal(id, links);
 	}
+}
+
+QString ControlFlowGeneratorBase::threadId()
+{
+	return mThreadId;
 }

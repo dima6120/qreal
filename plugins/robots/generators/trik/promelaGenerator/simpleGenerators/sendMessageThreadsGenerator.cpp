@@ -1,7 +1,7 @@
 #include "sendMessageThreadsGenerator.h"
 
 #include <generatorBase/generatorCustomizer.h>
-#include <generatorBase/parts/threads.h>
+#include <generatorBase/parts/subprograms.h>
 
 using namespace generatorBase::simple;
 using namespace trik::promela::simple;
@@ -11,7 +11,8 @@ SendMessageThreadsGenerator::SendMessageThreadsGenerator(const qrRepo::RepoApi &
 		, const qReal::Id &id
 		, QObject *parent)
 	: BindingGenerator(repo, customizer, id, "threads/sendMessage.t"
-			, { Binding::createStatic("@@SENDER@@", customizer.factory()->threads().blockThreadId(id))
+			, { Binding::createStatic("@@SENDER@@"
+						, customizer.factory()->subprograms()->currentControlFlow()->threadId())
 				, Binding::createConverting("@@MESSAGE@@"
 					, "Message"
 					, customizer.factory()->functionBlockConverter(id, "Message"))

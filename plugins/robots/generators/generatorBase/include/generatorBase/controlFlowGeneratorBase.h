@@ -66,6 +66,8 @@ public:
 	void visitFork(const qReal::Id &id, QList<LinkInfo> &links) override;
 	void visitJoin(const qReal::Id &id, QList<LinkInfo> &links) override;
 
+	QString threadId();
+
 protected:
 	/// Can be overloaded by ancestors for custom behaviour.
 	virtual void performGeneration();

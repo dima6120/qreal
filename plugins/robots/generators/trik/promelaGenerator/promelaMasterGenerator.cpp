@@ -24,7 +24,7 @@ QString PromelaMasterGenerator::targetPath()
 
 void PromelaMasterGenerator::processGeneratedCode(QString &generatedCode)
 {
-
+	generatedCode.replace("@@CHANNELS@@", generateThreadsChannels());
 }
 
 generatorBase::GeneratorCustomizer *PromelaMasterGenerator::createCustomizer()
@@ -39,7 +39,7 @@ QString PromelaMasterGenerator::generateThreadsChannels()
 	QString channels = "";
 	int number = 1;
 
-	for (QString const &name : mCustomizer->factory()->threads().threadNames()) {
+	for (QString const &name : mCustomizer->factory()->threads().threadIds()) {
 		defines += readTemplate("defineProcessId.t").replace("@@NAME@@", name).replace("@@NUMBER@@"
 				, QString::number(number)) + "\n";
 		channels += readTemplate("defineProcessChannels.t").replace("@@NAME@@", name) + "\n";

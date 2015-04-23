@@ -1,5 +1,8 @@
 #include "defines"
 #include "setProcess"
+
+@@CHANNELS@@
+
 @@VARIABLES@@
 
 @@SUBPROGRAMS@@
