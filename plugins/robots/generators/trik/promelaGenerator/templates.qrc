@@ -204,5 +204,6 @@
         <file>templates/threads/receiveMessage.t</file>
         <file>templates/threads/sendMessage.t</file>
         <file>templates/defineProcessChannels.t</file>
+        <file>templates/luaPrinting/arrayAssignment.t</file>
     </qresource>
 </RCC>

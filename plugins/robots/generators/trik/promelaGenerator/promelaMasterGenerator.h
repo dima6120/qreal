@@ -5,7 +5,6 @@
 namespace trik {
 namespace promela {
 
-/// Master generator implementation for generator into QtScript for TRIK platform
 class PromelaMasterGenerator : public generatorBase::MasterGeneratorBase
 {
 public:
@@ -22,6 +21,7 @@ protected:
 	bool supportsGotoGeneration() const override;
 	void processGeneratedCode(QString &generatedCode) override;
 	generatorBase::GeneratorCustomizer *createCustomizer() override;
+	generatorBase::lua::LuaProcessor *createLuaProcessor() override;
 
 private:
 	QString generateThreadsChannels();

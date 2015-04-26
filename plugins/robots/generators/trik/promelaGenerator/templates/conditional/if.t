@@ -1,5 +1,5 @@
 if 
-:: @@CONDITION@@ ->
+:: (@@CONDITION@@) ->
 @@THEN_BODY@@
 :: else -> skip
 fi;

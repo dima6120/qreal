@@ -1,6 +1,9 @@
 #include "promelaMasterGenerator.h"
-#include "generatorBase/parts/threads.h"
+
+#include <generatorBase/parts/threads.h>
+
 #include "promelaGeneratorCustomizer.h"
+#include "lua/promelaLuaProcessor.h"
 
 using namespace trik::promela;
 using namespace generatorBase::parts;
@@ -31,6 +34,11 @@ generatorBase::GeneratorCustomizer *PromelaMasterGenerator::createCustomizer()
 {
 	return new PromelaGeneratorCustomizer(mRepo, mErrorReporter
 			, mRobotModelManager, *createLuaProcessor(), mGeneratorName);
+}
+
+generatorBase::lua::LuaProcessor *PromelaMasterGenerator::createLuaProcessor()
+{
+	return new lua::PromelaLuaProcessor(mErrorReporter, mTextLanguage, mParserErrorReporter, this);
 }
 
 QString PromelaMasterGenerator::generateThreadsChannels()

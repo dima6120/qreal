@@ -1,1 +1,1 @@
-#define @@NAME@@proc @@NUMBER@@
+#define	@@NAME@@proc @@NUMBER@@

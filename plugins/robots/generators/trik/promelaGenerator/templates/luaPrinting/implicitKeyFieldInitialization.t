@@ -1,1 +1,1 @@
-@@VALUE@@
+@@VARIABLE@@.a[@@INDEX@@] = @@VALUE@@

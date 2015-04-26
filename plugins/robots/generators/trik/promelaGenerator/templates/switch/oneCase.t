@@ -1,1 +1,1 @@
-::(@@EXPRESSION@@ == @@VALUE@@) ->
+== @@VALUE@@) ->

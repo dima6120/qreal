@@ -1,2 +1,2 @@
-@@CONDITION@@
+:: (@@EXPRESSION@@ @@CONDITION@@
 @@BODY@@

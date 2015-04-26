@@ -19,6 +19,7 @@
 #include "precedenceConverter.h"
 #include "generatorBase/templateParametrizedEntity.h"
 #include "generatorBase/simpleGenerators/binding.h"
+#include "generatorBase/lua/luaPrinter.h"
 
 namespace qReal {
 class ErrorReporterInterface;
@@ -62,6 +63,8 @@ public:
 
 	/// Returns facade object for manipulating text language.
 	qrtext::LanguageToolboxInterface &toolbox() const;
+
+	virtual lua::LuaPrinter *createLuaPrinter(const simple::Binding::ConverterInterface *reservedVariablesConverter);
 
 protected:
 	/// Can be overrided to return precedence precedence table for the target language.

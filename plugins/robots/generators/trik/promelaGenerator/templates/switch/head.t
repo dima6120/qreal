@@ -1,3 +1,3 @@
 if
-@@CONDITION@@
+:: (@@EXPRESSION@@ @@CONDITION@@
 @@BODY@@

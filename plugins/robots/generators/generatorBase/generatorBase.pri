@@ -146,6 +146,7 @@ HEADERS += \
 	$$PWD/include/generatorBase/simpleGenerators/binding.h \
 	$$PWD/include/generatorBase/simpleGenerators/bindingGenerator.h \
 	$$PWD/include/generatorBase/simpleGenerators/waitForButtonGenerator.h \
+	$$PWD/include/generatorBase/lua/luaPrinter.h \
 
 HEADERS += \
 	$$PWD/src/converters/reservedVariablesConverter.h \
@@ -198,7 +199,6 @@ HEADERS += \
 	$$PWD/src/simpleGenerators/variableInitGenerator.h \
 	$$PWD/src/simpleGenerators/sendMessageThreadsGenerator.h \
 	$$PWD/src/simpleGenerators/receiveMessageThreadsGenerator.h \
-	$$PWD/src/lua/luaPrinter.h \
 	$$PWD/src/lua/reservedFunctionsConverter.h \
 
 SOURCES += \

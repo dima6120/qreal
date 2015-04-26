@@ -17,8 +17,6 @@
 #include <qrtext/languageToolboxInterface.h>
 #include <qrgui/plugins/toolPluginInterface/usedInterfaces/errorReporterInterface.h>
 
-#include "src/lua/luaPrinter.h"
-
 using namespace generatorBase::lua;
 using namespace qReal;
 
@@ -40,8 +38,10 @@ QString LuaProcessor::translate(const QString &data
 		, const simple::Binding::ConverterInterface *reservedVariablesConverter)
 {
 	const QSharedPointer<qrtext::core::ast::Node> tree = parse(data, id, propertyName);
-	return lua::LuaPrinter(pathToRoot(), mTextLanguage
-			, precedenceConverter(), reservedVariablesConverter).print(tree);
+	LuaPrinter *printer = createLuaPrinter(reservedVariablesConverter);
+	const QString res = printer->print(tree);
+	delete printer;
+	return res;
 }
 
 
@@ -51,8 +51,10 @@ QString LuaProcessor::castToString(const QString &data
 		, const simple::Binding::ConverterInterface *reservedVariablesConverter)
 {
 	const QSharedPointer<qrtext::core::ast::Node> tree = parse(data, id, propertyName);
-	return lua::LuaPrinter(pathToRoot(), mTextLanguage
-			, precedenceConverter(), reservedVariablesConverter).castToString(tree);
+	LuaPrinter *printer = createLuaPrinter(reservedVariablesConverter);
+	const QString res = printer->castToString(tree);
+	delete printer;
+	return res;
 }
 
 QSharedPointer<qrtext::core::ast::Node> LuaProcessor::parse(const QString &data
@@ -71,6 +73,12 @@ QSharedPointer<qrtext::core::ast::Node> LuaProcessor::parse(const QString &data
 qrtext::LanguageToolboxInterface &LuaProcessor::toolbox() const
 {
 	return mTextLanguage;
+}
+
+LuaPrinter *LuaProcessor::createLuaPrinter(const simple::Binding::ConverterInterface *reservedVariablesConverter)
+{
+	return new lua::LuaPrinter(pathToRoot(), mTextLanguage
+			, precedenceConverter(), reservedVariablesConverter);
 }
 
 PrecedenceConverterInterface &LuaProcessor::precedenceConverter()

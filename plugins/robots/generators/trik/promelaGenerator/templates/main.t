@@ -1,7 +1,8 @@
 #include "defines"
 #include "setProcess"
 
-@@CHANNELS@@
+#define mainproc 1
+@@CHANNELS@@chan mainchan = [0] of {int, array};
 
 @@VARIABLES@@
 
