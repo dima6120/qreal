@@ -2,6 +2,8 @@
 
 #include <generatorBase/lua/luaProcessor.h>
 
+#include "parts/strings.h"
+
 namespace trik {
 namespace promela {
 namespace lua {
@@ -14,8 +16,13 @@ public:
 			, const utils::ParserErrorReporter &parserErrorReporter
 			, QObject *parent = 0);
 
+	void setStrings(parts::Strings *strings);
+
 	generatorBase::lua::LuaPrinter *createLuaPrinter(
 			const generatorBase::simple::Binding::ConverterInterface *reservedVariablesConverter) override;
+
+private:
+	parts::Strings *mStrings;
 };
 
 }

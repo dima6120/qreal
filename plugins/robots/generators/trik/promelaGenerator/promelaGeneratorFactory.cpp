@@ -9,6 +9,8 @@
 #include "simpleGenerators/sendMessageThreadsGenerator.h"
 #include "simpleGenerators/receiveMessageThreadsGenerator.h"
 #include "simpleGenerators/switchGenerator.h"
+#include "simpleGenerators/variableInitGenerator.h"
+#include "lua/promelaLuaProcessor.h"
 
 using namespace trik::promela;
 using namespace trik::promela::simple;
@@ -20,13 +22,20 @@ using namespace generatorBase::parts;
 PromelaGeneratorFactory::PromelaGeneratorFactory(const qrRepo::RepoApi &repo
 		 , qReal::ErrorReporterInterface &errorReporter
 		 , const kitBase::robotModel::RobotModelManagerInterface &robotModelManager
-		 , lua::LuaProcessor &luaProcessor
+		 , generatorBase::lua::LuaProcessor &luaProcessor
 		 , const QString &generatorName)
 	: TrikGeneratorFactory(repo, errorReporter, robotModelManager, luaProcessor, generatorName)
 	, mSwitchCounter(0)
 	, mCaseCounter(0)
 	, mStringSwitch(false)
+	, mStrings(new parts::Strings(pathToTemplates()))
 {
+	dynamic_cast<lua::PromelaLuaProcessor *>(&luaProcessor)->setStrings(mStrings);
+}
+
+trik::promela::parts::Strings &PromelaGeneratorFactory::strings()
+{
+	return *mStrings;
 }
 
 AbstractSimpleGenerator *PromelaGeneratorFactory::simpleGenerator(const qReal::Id &id
@@ -38,6 +47,8 @@ AbstractSimpleGenerator *PromelaGeneratorFactory::simpleGenerator(const qReal::I
 		return new SendMessageThreadsGenerator(mRepo, customizer, id, this);
 	} else if (elementType == "ReceiveMessageThreads") {
 		return new ReceiveMessageThreadsGenerator(mRepo, customizer, id, this);
+	} else if (elementType == "VariableInit") {
+		return new VariableInitGenerator(mRepo, customizer, id, this);
 	}
 
 	return TrikGeneratorFactory::simpleGenerator(id, customizer);

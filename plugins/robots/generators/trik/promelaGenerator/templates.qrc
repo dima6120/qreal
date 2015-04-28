@@ -209,6 +209,10 @@
         <file>templates/switch/stringComparisons.t</file>
         <file>templates/luaPrinting/finalConcatenation.t</file>
         <file>templates/luaPrinting/oneConcatenation.t</file>
-        <file>templates/luaPrinting/stringAssignment.t</file>
+        <file>templates/variables/constStringInit.t</file>
+        <file>templates/variables/oneCharInit.t</file>
+        <file>templates/variables/constStringsInit.t</file>
+        <file>templates/luaPrinting/stringAssignment1.t</file>
+        <file>templates/luaPrinting/stringAssignment2.t</file>
     </qresource>
 </RCC>

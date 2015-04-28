@@ -2,6 +2,8 @@
 
 #include <trikGeneratorBase/trikGeneratorFactory.h>
 
+#include "parts/strings.h"
+
 namespace trik {
 namespace promela {
 
@@ -13,6 +15,8 @@ public:
 			 , const kitBase::robotModel::RobotModelManagerInterface &robotModelManager
 			 , generatorBase::lua::LuaProcessor &luaProcessor
 			 , const QString &generatorName);
+
+	parts::Strings &strings();
 
 	generatorBase::simple::AbstractSimpleGenerator *simpleGenerator(const qReal::Id &id
 			, generatorBase::GeneratorCustomizer &customizer) override;
@@ -27,6 +31,8 @@ private:
 	int mSwitchCounter;
 	int mCaseCounter;
 	bool mStringSwitch;
+
+	parts::Strings *mStrings;
 };
 
 }

@@ -27,7 +27,9 @@ HEADERS += \
 	$$PWD/simpleGenerators/receiveMessageThreadsGenerator.h \
 	$$PWD/lua/promelaLuaPrinter.h \
 	$$PWD/lua/promelaLuaProcessor.h \
-	$$PWD/simpleGenerators/switchGenerator.h
+	$$PWD/simpleGenerators/switchGenerator.h \
+    parts/strings.h \
+    simpleGenerators/variableInitGenerator.h
 
 SOURCES += \
 	$$PWD/promelaGeneratorPlugin.cpp \
@@ -38,7 +40,9 @@ SOURCES += \
 	$$PWD/simpleGenerators/receiveMessageThreadsGenerator.cpp \
 	$$PWD/lua/promelaLuaPrinter.cpp \
 	$$PWD/lua/promelaLuaProcessor.cpp \
-	$$PWD/simpleGenerators/switchGenerator.cpp
+	$$PWD/simpleGenerators/switchGenerator.cpp \
+    parts/strings.cpp \
+    simpleGenerators/variableInitGenerator.cpp
 
 RESOURCES = \
 	$$PWD/templates.qrc \

@@ -12,11 +12,13 @@ using namespace qrtext::lua::ast;
 using namespace qrtext::core;
 
 PromelaLuaPrinter::PromelaLuaPrinter(const QString &pathToTemplates
-		 , const qrtext::LanguageToolboxInterface &textLanguage
-		 , generatorBase::lua::PrecedenceConverterInterface &precedeceTable
-		 , const generatorBase::simple::Binding::ConverterInterface *reservedVariablesConverter)
+		, const qrtext::LanguageToolboxInterface &textLanguage
+		, generatorBase::lua::PrecedenceConverterInterface &precedeceTable
+		, const generatorBase::simple::Binding::ConverterInterface *reservedVariablesConverter
+		, parts::Strings &strings)
 	: LuaPrinter(pathToTemplates, textLanguage, precedeceTable, reservedVariablesConverter)
 	, mTempStringNumber(0)
+	, mStrings(strings)
 {
 }
 
@@ -26,11 +28,13 @@ void PromelaLuaPrinter::visit(const Assignment &node)
 		processTemplate(node, "arrayAssignment.t", { {"@@INITIALIZERS@@", node.value()}
 				, {"@@VARIABLE@@", node.variable()} });
 	} else if (!node.value().dynamicCast<Concatenation>().isNull()){
-		mTempStringNumber = 0;
-		processTemplate(node, "stringAssignment.t", { {"@@CONCATENATIONS@@", node.value()}
+		processTemplate(node, "stringAssignment1.t", { {"@@CONCATENATIONS@@", node.value()}
 				, {"@@VARIABLE@@", node.variable()} });
 		pushResult(node, popResult(node).replace("@@NUMBER@@"
 				, QString::number(concatenationNumber(node.value().data()) - 1) ));
+	} else if (!node.value().dynamicCast<String>().isNull()) {
+		processTemplate(node, "stringAssignment2.t", { {"@@VALUE@@", node.value()}
+				, {"@@VARIABLE@@", node.variable()} });
 	} else {
 		LuaPrinter::visit(node);
 	}
@@ -54,9 +58,8 @@ void PromelaLuaPrinter::visit(const Concatenation &node)
 {
 	bool const rightConcat = !node.rightOperand().dynamicCast<Concatenation>().isNull();
 	bool const leftConcat = !node.leftOperand().dynamicCast<Concatenation>().isNull();
-	QString t = "oneConcatenation.t";
 
-	pushResult(node, readTemplate(t)
+	pushResult(node, readTemplate("oneConcatenation.t")
 			.replace("@@LEFT@@"
 					, !leftConcat
 							? toString(node.leftOperand())
@@ -75,18 +78,18 @@ void PromelaLuaPrinter::visit(const Concatenation &node)
 
 void PromelaLuaPrinter::visit(const String &node)
 {
-	pushResult(node, readTemplate("string.t").replace("@@VALUE@@", node.string()));
+	pushResult(node, readTemplate("string.t").replace("@@VALUE@@"
+			, mStrings.addString(node.string())));
 }
 
 int PromelaLuaPrinter::concatenationNumber(Node *node)
 {
-	QSharedPointer<Node> p(node);
+	Concatenation *c = dynamic_cast<Concatenation *>(node);
 
-	if (p.dynamicCast<Concatenation>().isNull()) {
+	if (c == nullptr) {
 		return 0;
 	} else {
-		QSharedPointer<Concatenation> c(p.dynamicCast<Concatenation>());
-		return 1 + concatenationNumber(c.data()->leftOperand().data())
-				+ concatenationNumber(c.data()->rightOperand().data());
+		return 1 + concatenationNumber(c->leftOperand().data())
+				+ concatenationNumber(c->rightOperand().data());
 	}
 }

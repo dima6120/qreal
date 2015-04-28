@@ -28,6 +28,7 @@ QString PromelaMasterGenerator::targetPath()
 void PromelaMasterGenerator::processGeneratedCode(QString &generatedCode)
 {
 	generatedCode.replace("@@CHANNELS@@", generateThreadsChannels());
+	dynamic_cast<PromelaGeneratorFactory *> (mCustomizer->factory())->strings().processCode(generatedCode);
 }
 
 generatorBase::GeneratorCustomizer *PromelaMasterGenerator::createCustomizer()

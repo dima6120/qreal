@@ -14,9 +14,14 @@ PromelaLuaProcessor::PromelaLuaProcessor(qReal::ErrorReporterInterface &errorRep
 {
 }
 
+void PromelaLuaProcessor::setStrings(parts::Strings *strings)
+{
+	mStrings = strings;
+}
+
 LuaPrinter *PromelaLuaProcessor::createLuaPrinter(
 		const simple::Binding::ConverterInterface *reservedVariablesConverter)
 {
 	return new PromelaLuaPrinter(pathToRoot(), mTextLanguage
-			, precedenceConverter(), reservedVariablesConverter);
+			, precedenceConverter(), reservedVariablesConverter, *mStrings);
 }
