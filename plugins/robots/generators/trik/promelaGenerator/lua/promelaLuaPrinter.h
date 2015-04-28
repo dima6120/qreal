@@ -17,6 +17,13 @@ public:
 
 	void visit(const qrtext::lua::ast::Assignment &node) override;
 	void visit(const qrtext::lua::ast::TableConstructor &node) override;
+	void visit(const qrtext::lua::ast::Concatenation &node) override;
+	void visit(const qrtext::lua::ast::String &node) override;
+
+private:
+	int concatenationNumber(qrtext::lua::ast::Node *node);
+
+	int mTempStringNumber;
 };
 
 }

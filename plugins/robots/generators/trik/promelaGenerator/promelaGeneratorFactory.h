@@ -16,6 +16,17 @@ public:
 
 	generatorBase::simple::AbstractSimpleGenerator *simpleGenerator(const qReal::Id &id
 			, generatorBase::GeneratorCustomizer &customizer) override;
+	generatorBase::simple::AbstractSimpleGenerator *switchHeadGenerator(const qReal::Id &id
+			, generatorBase::GeneratorCustomizer &customizer, const QStringList &values) override;
+	generatorBase::simple::AbstractSimpleGenerator *switchMiddleGenerator(const qReal::Id &id
+			, generatorBase::GeneratorCustomizer &customizer, const QStringList &values) override;
+
+private:
+	//QString stringComparisons(QString const &expression, generatorBase::GeneratorCustomizer &customizer);
+
+	int mSwitchCounter;
+	int mCaseCounter;
+	bool mStringSwitch;
 };
 
 }

@@ -1,3 +1,3 @@
-atomic {
+d_step {
 	@@INITIALIZERS@@
 }

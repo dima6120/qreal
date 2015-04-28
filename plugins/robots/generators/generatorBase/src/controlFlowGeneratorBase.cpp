@@ -194,3 +194,8 @@ QString ControlFlowGeneratorBase::threadId()
 {
 	return mThreadId;
 }
+
+semantics::SemanticTree *ControlFlowGeneratorBase::semanticTree()
+{
+	return mSemanticTree;
+}

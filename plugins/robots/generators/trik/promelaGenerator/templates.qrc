@@ -205,5 +205,10 @@
         <file>templates/threads/sendMessage.t</file>
         <file>templates/defineProcessChannels.t</file>
         <file>templates/luaPrinting/arrayAssignment.t</file>
+        <file>templates/switch/oneStringComparison.t</file>
+        <file>templates/switch/stringComparisons.t</file>
+        <file>templates/luaPrinting/finalConcatenation.t</file>
+        <file>templates/luaPrinting/oneConcatenation.t</file>
+        <file>templates/luaPrinting/stringAssignment.t</file>
     </qresource>
 </RCC>

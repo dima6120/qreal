@@ -67,6 +67,7 @@ public:
 	void visitJoin(const qReal::Id &id, QList<LinkInfo> &links) override;
 
 	QString threadId();
+	semantics::SemanticTree *semanticTree();
 
 protected:
 	/// Can be overloaded by ancestors for custom behaviour.

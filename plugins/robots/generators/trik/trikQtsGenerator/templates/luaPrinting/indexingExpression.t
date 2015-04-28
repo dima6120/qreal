@@ -1,1 +1,1 @@
-@@TABLE@@.a[@@INDEXER@@]
+@@TABLE@@[@@INDEXER@@]

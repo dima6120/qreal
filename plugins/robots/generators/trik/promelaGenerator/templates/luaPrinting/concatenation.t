@@ -1,1 +1,2 @@
-@@LEFT@@ + @@RIGHT@@
+@@RIGHT@@
+@@LEFT@@
