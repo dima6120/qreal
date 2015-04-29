@@ -1,13 +1,20 @@
 #include "promelaLuaPrinter.h"
 
+#include <generatorBase/parts/variables.h>
 #include <qrtext/lua/ast/node.h>
 #include <qrtext/lua/ast/assignment.h>
 #include <qrtext/lua/ast/tableConstructor.h>
 #include <qrtext/lua/ast/fieldInitialization.h>
 #include <qrtext/lua/ast/concatenation.h>
 #include <qrtext/lua/ast/string.h>
+#include <qrtext/lua/ast/indexingExpression.h>
+#include <qrtext/lua/ast/identifier.h>
+#include <qrtext/lua/ast/number.h>
+#include <qrtext/lua/types/table.h>
+#include <qrtext/core/types/typeExpression.h>
 
 using namespace trik::promela::lua;
+using namespace qrtext::lua::types;
 using namespace qrtext::lua::ast;
 using namespace qrtext::core;
 
@@ -15,10 +22,10 @@ PromelaLuaPrinter::PromelaLuaPrinter(const QString &pathToTemplates
 		, const qrtext::LanguageToolboxInterface &textLanguage
 		, generatorBase::lua::PrecedenceConverterInterface &precedeceTable
 		, const generatorBase::simple::Binding::ConverterInterface *reservedVariablesConverter
-		, parts::Strings &strings)
+		, PromelaGeneratorCustomizer &customizer)
 	: LuaPrinter(pathToTemplates, textLanguage, precedeceTable, reservedVariablesConverter)
 	, mTempStringNumber(0)
-	, mStrings(strings)
+	, mCustomizer(customizer)
 {
 }
 
@@ -27,6 +34,8 @@ void PromelaLuaPrinter::visit(const Assignment &node)
 	if (!node.value().dynamicCast<TableConstructor>().isNull()) {
 		processTemplate(node, "arrayAssignment.t", { {"@@INITIALIZERS@@", node.value()}
 				, {"@@VARIABLE@@", node.variable()} });
+		pushResult(node, popResult(node).replace("@@SIZE@@"
+				, QString::number(dynamic_cast<TableConstructor *>(node.value().data())->initializers().size())));
 	} else if (!node.value().dynamicCast<Concatenation>().isNull()){
 		processTemplate(node, "stringAssignment1.t", { {"@@CONCATENATIONS@@", node.value()}
 				, {"@@VARIABLE@@", node.variable()} });
@@ -79,7 +88,32 @@ void PromelaLuaPrinter::visit(const Concatenation &node)
 void PromelaLuaPrinter::visit(const String &node)
 {
 	pushResult(node, readTemplate("string.t").replace("@@VALUE@@"
-			, mStrings.addString(node.string())));
+			, mCustomizer.promelaFactory()->strings().addString(node.string())));
+}
+
+void PromelaLuaPrinter::visit(const FieldInitialization &node)
+{
+	const QString templatePath = node.value().dynamicCast<String>().isNull()
+			? "implicitKeyIntFieldInitialization.t"
+			: "implicitKeyStringFieldInitialization.t";
+	processTemplate(node, templatePath, { {"@@VALUE@@", node.value()} });
+}
+
+void PromelaLuaPrinter::visit(const IndexingExpression &node)
+{
+	QString const name = dynamic_cast<Identifier *>(node.table().data())->name();
+	types::TypeExpression *type = mCustomizer.factory()->variables()->expressionType(name).data();
+	Table *table = dynamic_cast<Table *>(type);
+
+	if (table != nullptr) {
+		//todo: what about float?
+		processTemplate(node, !table->elementType().dynamicCast<String>().isNull()
+				? "indexingExpressionStringType.t"
+				: "indexingExpressionIntType.t"
+				, { {"@@TABLE@@", node.table()}, {"@@INDEXER@@", node.indexer()} });
+	} else {
+		visit(node);
+	}
 }
 
 int PromelaLuaPrinter::concatenationNumber(Node *node)

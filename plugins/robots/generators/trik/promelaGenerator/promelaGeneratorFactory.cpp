@@ -20,17 +20,19 @@ using namespace qrtext::core::types;
 using namespace generatorBase::parts;
 
 PromelaGeneratorFactory::PromelaGeneratorFactory(const qrRepo::RepoApi &repo
-		 , qReal::ErrorReporterInterface &errorReporter
-		 , const kitBase::robotModel::RobotModelManagerInterface &robotModelManager
-		 , generatorBase::lua::LuaProcessor &luaProcessor
-		 , const QString &generatorName)
+		, qReal::ErrorReporterInterface &errorReporter
+		, const kitBase::robotModel::RobotModelManagerInterface &robotModelManager
+		, generatorBase::lua::LuaProcessor &luaProcessor
+		, const QString &generatorName
+		, GeneratorCustomizer *customizer)
 	: TrikGeneratorFactory(repo, errorReporter, robotModelManager, luaProcessor, generatorName)
 	, mSwitchCounter(0)
 	, mCaseCounter(0)
 	, mStringSwitch(false)
 	, mStrings(new parts::Strings(pathToTemplates()))
 {
-	dynamic_cast<lua::PromelaLuaProcessor *>(&luaProcessor)->setStrings(mStrings);
+	dynamic_cast<lua::PromelaLuaProcessor *>(&luaProcessor)
+			->setCustomizer(*dynamic_cast<PromelaGeneratorCustomizer *>(customizer));
 }
 
 trik::promela::parts::Strings &PromelaGeneratorFactory::strings()

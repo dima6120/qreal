@@ -1,4 +1,4 @@
 inline @@NAME@@()
 {
-	@@BODY@@
+@@BODY@@
 }

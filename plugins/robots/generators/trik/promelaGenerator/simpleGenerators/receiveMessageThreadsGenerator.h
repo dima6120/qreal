@@ -14,6 +14,10 @@ public:
 			, generatorBase::GeneratorCustomizer &customizer
 			, const qReal::Id &id
 			, QObject *parent = 0);
+
+private:
+	QString templateSelection(const qrRepo::RepoApi &repo
+			, generatorBase::GeneratorCustomizer &customizer, const qReal::Id &id);
 };
 
 }

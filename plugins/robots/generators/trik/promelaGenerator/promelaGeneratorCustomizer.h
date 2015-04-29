@@ -17,6 +17,7 @@ public:
 								, const QString &generatorName);
 
 	generatorBase::GeneratorFactoryBase *factory() override;
+	PromelaGeneratorFactory *promelaFactory();
 
 private:
 	PromelaGeneratorFactory mFactory;

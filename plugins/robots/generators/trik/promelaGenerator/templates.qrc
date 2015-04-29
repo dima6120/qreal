@@ -176,7 +176,7 @@
         <file>templates/luaPrinting/functionCall.t</file>
         <file>templates/luaPrinting/greaterOrEqual.t</file>
         <file>templates/luaPrinting/greaterThan.t</file>
-        <file>templates/luaPrinting/implicitKeyFieldInitialization.t</file>
+        <file>templates/luaPrinting/implicitKeyIntFieldInitialization.t</file>
         <file>templates/luaPrinting/indexingExpression.t</file>
         <file>templates/luaPrinting/inequality.t</file>
         <file>templates/luaPrinting/integerDivision.t</file>
@@ -214,5 +214,13 @@
         <file>templates/variables/constStringsInit.t</file>
         <file>templates/luaPrinting/stringAssignment1.t</file>
         <file>templates/luaPrinting/stringAssignment2.t</file>
+        <file>templates/luaPrinting/implicitKeyStringFieldInitialization.t</file>
+        <file>templates/luaPrinting/indexingExpressionIntType.t</file>
+        <file>templates/luaPrinting/indexingExpressionStringType.t</file>
+        <file>templates/threads/sendMessageInt.t</file>
+        <file>templates/threads/sendMessageString.t</file>
+        <file>templates/threads/sendMessageTableConstructor.t</file>
+        <file>templates/threads/receiveMessageInt.t</file>
+        <file>templates/threads/receiveMessageString.t</file>
     </qresource>
 </RCC>

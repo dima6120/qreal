@@ -1,3 +1,4 @@
 d_step {
-	@@INITIALIZERS@@
+	@@VARIABLE@@.size = @@SIZE@@;
+@@INITIALIZERS@@
 }

@@ -11,10 +11,11 @@ class PromelaGeneratorFactory : public TrikGeneratorFactory
 {
 public:
 	PromelaGeneratorFactory(const qrRepo::RepoApi &repo
-			 , qReal::ErrorReporterInterface &errorReporter
-			 , const kitBase::robotModel::RobotModelManagerInterface &robotModelManager
-			 , generatorBase::lua::LuaProcessor &luaProcessor
-			 , const QString &generatorName);
+			, qReal::ErrorReporterInterface &errorReporter
+			, const kitBase::robotModel::RobotModelManagerInterface &robotModelManager
+			, generatorBase::lua::LuaProcessor &luaProcessor
+			, const QString &generatorName
+			, generatorBase::GeneratorCustomizer *customizer);
 
 	parts::Strings &strings();
 

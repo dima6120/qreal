@@ -2,6 +2,7 @@
 
 #include <generatorBase/lua/luaProcessor.h>
 
+#include "promelaGeneratorCustomizer.h"
 #include "parts/strings.h"
 
 namespace trik {
@@ -16,13 +17,13 @@ public:
 			, const utils::ParserErrorReporter &parserErrorReporter
 			, QObject *parent = 0);
 
-	void setStrings(parts::Strings *strings);
+	void setCustomizer(PromelaGeneratorCustomizer &customizer);
 
 	generatorBase::lua::LuaPrinter *createLuaPrinter(
 			const generatorBase::simple::Binding::ConverterInterface *reservedVariablesConverter) override;
 
 private:
-	parts::Strings *mStrings;
+	PromelaGeneratorCustomizer *mCustomizer;
 };
 
 }

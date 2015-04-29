@@ -21,11 +21,9 @@ public:
 private:
 	QString declarations();
 	QString initialization();
-	void replaceStubs(QString &code);
 
 	int mStringNumber;
 
-	QMap<QString, QString> mStubs;
 	QMap<QString, QString> mNames;
 	QSet<QString> mStrings;
 };

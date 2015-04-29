@@ -1,1 +1,1 @@
-run TASK_@@NAME@@(); /*"@@THREAD_ID@@"*/
+run TASK_@@NAME@@(); /*@@THREAD_ID@@*/

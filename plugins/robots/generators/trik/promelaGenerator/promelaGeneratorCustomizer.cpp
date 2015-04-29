@@ -8,11 +8,16 @@ PromelaGeneratorCustomizer::PromelaGeneratorCustomizer(const qrRepo::RepoApi &re
 		, const kitBase::robotModel::RobotModelManagerInterface &robotModelManager
 		, generatorBase::lua::LuaProcessor &luaProcessor
 		, const QString &generatorName)
-	: mFactory(repo, errorReporter, robotModelManager, luaProcessor, generatorName)
+	: mFactory(repo, errorReporter, robotModelManager, luaProcessor, generatorName, this)
 {
 }
 
 generatorBase::GeneratorFactoryBase *PromelaGeneratorCustomizer::factory()
+{
+	return &mFactory;
+}
+
+PromelaGeneratorFactory *PromelaGeneratorCustomizer::promelaFactory()
 {
 	return &mFactory;
 }
