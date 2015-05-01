@@ -222,5 +222,8 @@
         <file>templates/threads/sendMessageTableConstructor.t</file>
         <file>templates/threads/receiveMessageInt.t</file>
         <file>templates/threads/receiveMessageString.t</file>
+        <file>templates/luaPrinting/skip.t</file>
+        <file>templates/conditional/deadIf.t</file>
+        <file>templates/conditional/deadIfElse.t</file>
     </qresource>
 </RCC>

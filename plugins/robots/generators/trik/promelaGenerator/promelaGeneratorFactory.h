@@ -25,6 +25,8 @@ public:
 			, generatorBase::GeneratorCustomizer &customizer, const QStringList &values) override;
 	generatorBase::simple::AbstractSimpleGenerator *switchMiddleGenerator(const qReal::Id &id
 			, generatorBase::GeneratorCustomizer &customizer, const QStringList &values) override;
+	generatorBase::simple::AbstractSimpleGenerator *ifGenerator(const qReal::Id &id
+			, generatorBase::GeneratorCustomizer &customizer, bool elseIsEmpty, bool needInverting) override;
 
 private:
 	//QString stringComparisons(QString const &expression, generatorBase::GeneratorCustomizer &customizer);

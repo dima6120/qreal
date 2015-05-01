@@ -40,7 +40,7 @@ QString LuaProcessor::translate(const QString &data
 	const QSharedPointer<qrtext::core::ast::Node> tree = parse(data, id, propertyName);
 	LuaPrinter *printer = createLuaPrinter(reservedVariablesConverter);
 	const QString res = printer->print(tree);
-	delete printer;
+	//delete printer;
 	return res;
 }
 
@@ -53,7 +53,7 @@ QString LuaProcessor::castToString(const QString &data
 	const QSharedPointer<qrtext::core::ast::Node> tree = parse(data, id, propertyName);
 	LuaPrinter *printer = createLuaPrinter(reservedVariablesConverter);
 	const QString res = printer->castToString(tree);
-	delete printer;
+	//delete printer;
 	return res;
 }
 

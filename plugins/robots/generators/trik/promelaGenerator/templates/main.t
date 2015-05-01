@@ -13,13 +13,10 @@ inline initialization()
 @@CONST_STRINGS_INIT@@
 }
 
-/* variables */
 @@VARIABLES@@
 
-/*subprograms*/
 @@SUBPROGRAMS@@
 
-/*threads*/
 @@THREADS@@
 
 proctype main()

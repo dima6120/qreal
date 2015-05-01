@@ -11,7 +11,15 @@ PromelaLuaProcessor::PromelaLuaProcessor(qReal::ErrorReporterInterface &errorRep
 		 , const utils::ParserErrorReporter &parserErrorReporter
 		 , QObject *parent)
 	: LuaProcessor(errorReporter, textLanguage, parserErrorReporter, parent)
+	, mLuaPrinter(nullptr)
 {
+}
+
+PromelaLuaProcessor::~PromelaLuaProcessor()
+{
+	if (mLuaPrinter) {
+		delete mLuaPrinter;
+	}
 }
 
 void PromelaLuaProcessor::setCustomizer(PromelaGeneratorCustomizer &customizer)
@@ -22,6 +30,11 @@ void PromelaLuaProcessor::setCustomizer(PromelaGeneratorCustomizer &customizer)
 LuaPrinter *PromelaLuaProcessor::createLuaPrinter(
 		const simple::Binding::ConverterInterface *reservedVariablesConverter)
 {
-	return new PromelaLuaPrinter(pathToRoot(), mTextLanguage
-			, precedenceConverter(), reservedVariablesConverter, *mCustomizer);
+	if (mLuaPrinter == nullptr) {
+		mLuaPrinter = new PromelaLuaPrinter(pathToRoot(), mTextLanguage
+				, precedenceConverter(), nullptr, *mCustomizer);
+	}
+
+	mLuaPrinter->setReservedVariablesConverter(reservedVariablesConverter);
+	return mLuaPrinter;
 }

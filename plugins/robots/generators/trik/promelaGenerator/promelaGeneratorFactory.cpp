@@ -10,6 +10,7 @@
 #include "simpleGenerators/receiveMessageThreadsGenerator.h"
 #include "simpleGenerators/switchGenerator.h"
 #include "simpleGenerators/variableInitGenerator.h"
+#include "simpleGenerators/ifGenerator.h"
 #include "lua/promelaLuaProcessor.h"
 
 using namespace trik::promela;
@@ -79,4 +80,20 @@ AbstractSimpleGenerator *PromelaGeneratorFactory::switchMiddleGenerator(const qR
 	}
 
 	return GeneratorFactoryBase::switchMiddleGenerator(id, customizer, values);
+}
+
+AbstractSimpleGenerator *PromelaGeneratorFactory::ifGenerator(const qReal::Id &id
+		, GeneratorCustomizer &customizer
+		, bool elseIsEmpty
+		, bool needInverting)
+{
+	QString const condition =
+			customizer.factory()->boolPropertyConverter(id, "Condition", needInverting)
+			->convert(mRepo.property(id, "Condition").toString());
+
+	if (condition.isEmpty()) {
+		return new IfGenerator(mRepo, customizer, id, elseIsEmpty, needInverting, this);
+	}
+
+	return GeneratorFactoryBase::ifGenerator(id, customizer, elseIsEmpty, needInverting);
 }

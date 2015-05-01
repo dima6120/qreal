@@ -2,6 +2,7 @@
 
 #include <generatorBase/lua/luaProcessor.h>
 
+#include "promelaLuaPrinter.h"
 #include "promelaGeneratorCustomizer.h"
 #include "parts/strings.h"
 
@@ -17,12 +18,15 @@ public:
 			, const utils::ParserErrorReporter &parserErrorReporter
 			, QObject *parent = 0);
 
+	~PromelaLuaProcessor();
+
 	void setCustomizer(PromelaGeneratorCustomizer &customizer);
 
 	generatorBase::lua::LuaPrinter *createLuaPrinter(
 			const generatorBase::simple::Binding::ConverterInterface *reservedVariablesConverter) override;
 
 private:
+	PromelaLuaPrinter *mLuaPrinter;
 	PromelaGeneratorCustomizer *mCustomizer;
 };
 
