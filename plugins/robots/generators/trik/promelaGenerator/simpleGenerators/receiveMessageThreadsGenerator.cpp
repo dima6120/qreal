@@ -23,6 +23,7 @@ ReceiveMessageThreadsGenerator::ReceiveMessageThreadsGenerator(const qrRepo::Rep
 						, customizer.factory()->subprograms()->currentControlFlow()->threadId())
 				, Binding::createStatic("@@SENDER@@", repo.stringProperty(repo.outgoingLinks(id).at(0)
 						, "Guard"))
+				, Binding::createStatic("@@ASSIGNMENT@@", assignment(repo, customizer, id))
 				}
 			, parent)
 {
@@ -41,4 +42,27 @@ QString ReceiveMessageThreadsGenerator::templateSelection(const qrRepo::RepoApi 
 	} else {
 		return "receiveMessageInt.t";
 	}
+}
+
+QString ReceiveMessageThreadsGenerator::assignment(const qrRepo::RepoApi &repo
+		, generatorBase::GeneratorCustomizer &customizer, const qReal::Id &id)
+{
+	QString const variable = repo.property(id, "Variable").toString();
+	qrtext::core::types::TypeExpression *type = customizer.factory()->variables()->expressionType(variable).data();
+	Table *table = dynamic_cast<Table *>(type);
+
+	if (table != nullptr) {
+		if (!table->elementType().dynamicCast<String>().isNull()) {
+			return QString("copyStr(@@VARIABLE@@, @@VALUE@@)")
+					.replace("@@VARIABLE@@", variable + ".a[receive_i].s")
+					.replace("@@VALUE@@",
+						repo.stringProperty(repo.outgoingLinks(id).at(0), "Guard") + "proc_strings[receive_i]");
+		} else {
+			return QString("@@VARIABLE@@ = @@VALUE@@")
+					.replace("@@VARIABLE@@", variable + ".a[receive_i].i")
+					.replace("@@VALUE@@", "temp.a[receive_i]");
+		}
+	}
+
+	return QString();
 }

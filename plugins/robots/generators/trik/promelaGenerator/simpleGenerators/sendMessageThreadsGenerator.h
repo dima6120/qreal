@@ -18,6 +18,8 @@ public:
 private:
 	QString templateSelection(const qrRepo::RepoApi &repo
 			, generatorBase::GeneratorCustomizer &customizer, const qReal::Id &id);
+	bool isInt(const qrRepo::RepoApi &repo
+				  , generatorBase::GeneratorCustomizer &customizer, const qReal::Id &id);
 };
 
 }

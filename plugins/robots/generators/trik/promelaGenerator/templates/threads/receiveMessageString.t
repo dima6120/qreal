@@ -1,5 +1,5 @@
 atomic {
-	array temp;
+	message temp;
 	@@RECEIVER@@chan?@@SENDER@@proc(temp);
-	copyStr(@@VARIABLE@@, temp.a[0].s);
-}
+	copyStr(@@VARIABLE@@, @@SENDER@@proc_strings[0]);
+};

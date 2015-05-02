@@ -6,6 +6,7 @@
 #include <qrtext/core/types/typeExpression.h>
 #include <qrtext/lua/types/table.h>
 #include <qrtext/lua/types/string.h>
+#include <qrtext/lua/types/integer.h>
 
 using namespace generatorBase::simple;
 using namespace trik::promela::simple;
@@ -22,7 +23,13 @@ SendMessageThreadsGenerator::SendMessageThreadsGenerator(const qrRepo::RepoApi &
 					, "Message"
 					, customizer.factory()->functionBlockConverter(id, "Message"))
 				, Binding::createDirect("@@RECEIVER@@", "Thread")
-				, Binding::createStatic("@@VARIABLE@@", "temp")}
+				, Binding::createStatic("@@VARIABLE@@"
+					, isInt(repo, customizer, id) ? "temp"
+					: customizer.factory()->subprograms()->currentControlFlow()->threadId() + "proc_strings")
+				, Binding::createStatic("@@SIZE@@"
+					, QString::number(repo.property(id, "Message").toString().count(",") + 1))
+				, Binding::createStatic("@@I@@", "")
+				, Binding::createStatic("@@S@@", "")}
 			, parent)
 {
 }
@@ -44,4 +51,16 @@ QString SendMessageThreadsGenerator::templateSelection(const qrRepo::RepoApi &re
 	} else {
 		return "sendMessageInt.t";
 	}
+}
+
+bool SendMessageThreadsGenerator::isInt(const qrRepo::RepoApi &repo
+		, generatorBase::GeneratorCustomizer &customizer, const qReal::Id &id)
+{
+	QString const message = repo.property(id, "Message").toString();
+	qrtext::core::types::TypeExpression *type = customizer.factory()->variables()->expressionType(message).data();
+	bool const isInteger = dynamic_cast<Integer *>(type) != nullptr;
+	Table *table = dynamic_cast<Table *>(type);
+	bool const isIntTable = table != nullptr && !table->elementType().dynamicCast<Integer>().isNull();
+
+	return isInteger || isIntTable;
 }

@@ -1,1 +1,1 @@
-/*wait @@DELAY@@*/
+skip;/*wait @@DELAY@@*/

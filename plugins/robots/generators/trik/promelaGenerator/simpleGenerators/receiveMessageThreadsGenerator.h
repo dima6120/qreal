@@ -18,6 +18,9 @@ public:
 private:
 	QString templateSelection(const qrRepo::RepoApi &repo
 			, generatorBase::GeneratorCustomizer &customizer, const qReal::Id &id);
+	QString assignment(const qrRepo::RepoApi &repo
+			, generatorBase::GeneratorCustomizer &customizer
+			, const qReal::Id &id);
 };
 
 }

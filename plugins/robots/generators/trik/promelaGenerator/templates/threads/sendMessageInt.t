@@ -1,6 +1,6 @@
 atomic {
-	array temp;
-	temp.a[0].size = 1;
-	temp.a[0].i = @@MESSAGE@@;
+	message temp;
+	temp.size = 1;
+	temp.a[0] = @@MESSAGE@@;
 	@@RECEIVER@@chan!@@SENDER@@proc(temp);
-}
+};

@@ -1,9 +1,9 @@
 #include "defines"
-#include "setProcess"
 
 /*threads channels*/
-#define mainproc 1
-@@CHANNELS@@chan mainchan = [0] of {int, array};
+#define mainproc 0
+@@CHANNELS@@string mainproc_strings[32];
+chan mainchan = [0] of {int, message};
 
 /*const strings*/
 @@CONST_STRINGS@@
@@ -21,7 +21,7 @@ inline initialization()
 
 proctype main()
 {
-	@@MAIN_CODE@@
+@@MAIN_CODE@@
 }
 
 init

@@ -76,9 +76,10 @@ void PromelaLuaPrinter::visit(const Assignment &node)
 			processTemplate(node, "skip.t", { {"@@VALUE@@", node.value()}, {"@@VARIABLE@@", node.variable()} });
 		} else {
 			processTemplate(node, "arrayAssignment.t", { {"@@INITIALIZERS@@", node.value()}
-					, {"@@VARIABLE@@", node.variable()} });
+					, {"@@VARIABLE@@", node.variable()}});
 			pushResult(node, popResult(node).replace("@@SIZE@@"
-					, QString::number(dynamic_cast<TableConstructor *>(node.value().data())->initializers().size())));
+					, QString::number(dynamic_cast<TableConstructor *>(node.value().data())->initializers().size()))
+					.replace("@@I@@", ".i").replace("@@S@@", ".s"));
 		}
 	} else if (!node.value().dynamicCast<Concatenation>().isNull()){
 		//todo: dead node
@@ -152,7 +153,7 @@ void PromelaLuaPrinter::visit(const TableConstructor &node)
 	}
 
 	pushResult(node, readTemplate("tableConstructor.t")
-			.replace("@@COUNT@@", QString::number(initializers.count()))
+			//.replace("@@SIZE@@", QString::number(initializers.size()))
 			.replace("@@INITIALIZERS@@", initializers.join(readTemplate("fieldInitializersSeparator.t"))));
 }
 
