@@ -2,10 +2,12 @@
 
 #include <generatorBase/parts/threads.h>
 
+#include "parts/strings.h"
 #include "promelaGeneratorCustomizer.h"
 #include "lua/promelaLuaProcessor.h"
 
 using namespace trik::promela;
+using namespace trik::promela::parts;
 using namespace generatorBase::parts;
 
 PromelaMasterGenerator::PromelaMasterGenerator(const qrRepo::RepoApi &repo
@@ -47,13 +49,22 @@ QString PromelaMasterGenerator::generateThreadsChannels()
 	QString defines = "";
 	QString channels = "";
 	int number = 1;
+	PromelaGeneratorFactory *factory = dynamic_cast<PromelaGeneratorFactory *>(mCustomizer->factory());
 
 	for (QString const &name : mCustomizer->factory()->threads().threadIds()) {
 		defines += readTemplate("defineProcessId.t").replace("@@NAME@@", name).replace("@@NUMBER@@"
 				, QString::number(number)) + "\n";
-		channels += readTemplate("defineProcessChannels.t").replace("@@NAME@@", name) + "\n";
+		bool const stringChan = factory->strings().stringChannel(name);
+		channels += readTemplate("defineProcessChannels.t").replace("@@NAME@@", name)
+				.replace("@@STRING_BUFFER@@", stringChan
+					? readTemplate("defineProcessStringBuffer.t").replace("@@NAME@@", name)
+					: "")
+				+ "\n";
 		number++;
 	}
+
+	bool const stringChan = factory->strings().stringChannel("main");
+	channels += (stringChan ? readTemplate("defineProcessStringBuffer.t").replace("@@NAME@@", "main") : "") + "\n";
 
 	return defines + "\n" + channels;
 }

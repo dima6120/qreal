@@ -1,6 +1,5 @@
-atomic {
-	message temp;
+d_step {
 	temp.size = @@SIZE@@;
 @@MESSAGE@@
-	@@RECEIVER@@chan!@@SENDER@@proc(temp);
 };
+@@RECEIVER@@chan!@@SENDER@@proc(temp);

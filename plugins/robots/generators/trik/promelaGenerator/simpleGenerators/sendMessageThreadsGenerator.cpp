@@ -1,5 +1,7 @@
 #include "sendMessageThreadsGenerator.h"
 
+#include "promelaGeneratorFactory.h"
+
 #include <generatorBase/generatorCustomizer.h>
 #include <generatorBase/parts/subprograms.h>
 #include <generatorBase/parts/variables.h>
@@ -10,6 +12,7 @@
 
 using namespace generatorBase::simple;
 using namespace trik::promela::simple;
+using namespace trik::promela;
 using namespace qrtext::lua::types;
 
 SendMessageThreadsGenerator::SendMessageThreadsGenerator(const qrRepo::RepoApi &repo
@@ -39,16 +42,21 @@ QString SendMessageThreadsGenerator::templateSelection(const qrRepo::RepoApi &re
 {
 	QString const message = repo.property(id, "Message").toString();
 	qrtext::core::types::TypeExpression *type = customizer.factory()->variables()->expressionType(message).data();
+	PromelaGeneratorFactory *factory = dynamic_cast<PromelaGeneratorFactory *>(customizer.factory());
 
 	if (dynamic_cast<Table *>(type) != nullptr) {
+		factory->strings().setChannelType(repo.property(id, "Thread").toString()
+				, !dynamic_cast<Table *>(type)->elementType().dynamicCast<String>().isNull());
 		if (message.contains("{")) {
 			return "sendMessageTableConstructor.t";
 		} else {
 			return "sendMessage.t";
 		}
 	} else if (dynamic_cast<String *>(type) != nullptr) {
+		factory->strings().setChannelType(repo.property(id, "Thread").toString(), true);
 		return "sendMessageString.t";
 	} else {
+		factory->strings().setChannelType(repo.property(id, "Thread").toString(), false);
 		return "sendMessageInt.t";
 	}
 }

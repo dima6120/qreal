@@ -1,2 +1,2 @@
-string @@NAME@@proc_strings[32];
+@@STRING_BUFFER@@
 chan @@NAME@@chan = [0] of {int, message};

@@ -15,7 +15,7 @@ VariableInitGenerator::VariableInitGenerator(const qrRepo::RepoApi &repo
 		, GeneratorCustomizer &customizer
 		, const Id &id
 		, QObject *parent)
-	: BindingGenerator(repo, customizer, id, "function.t"
+	: BindingGenerator(repo, customizer, id, "initVar.t"
 			, { Binding::createStaticConverting("@@BODY@@"
 					, expressionChoice(repo, customizer, id)
 					, customizer.factory()->functionBlockConverter(id, "value")) }

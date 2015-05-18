@@ -2,7 +2,7 @@
 
 /*threads channels*/
 #define mainproc 0
-@@CHANNELS@@string mainproc_strings[32];
+@@CHANNELS@@
 chan mainchan = [0] of {int, message};
 
 /*const strings*/

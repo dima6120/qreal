@@ -225,5 +225,7 @@
         <file>templates/luaPrinting/skip.t</file>
         <file>templates/conditional/deadIf.t</file>
         <file>templates/conditional/deadIfElse.t</file>
+        <file>templates/initVar.t</file>
+        <file>templates/defineProcessStringBuffer.t</file>
     </qresource>
 </RCC>

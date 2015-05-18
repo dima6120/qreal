@@ -1,5 +1,7 @@
 #include "strings.h"
 
+#include <qrtext/lua/types/string.h>
+
 using namespace trik::promela::parts;
 
 
@@ -24,6 +26,16 @@ QString Strings::addString(const QString &string)
 	mStringNumber++;
 
 	return name;
+}
+
+void Strings::setChannelType(const QString &channel, bool string)
+{
+	mStringChannels.insert(channel, mStringChannels.value(channel, false) || string);
+}
+
+bool Strings::stringChannel(const QString &channel)
+{
+	return mStringChannels.value(channel, false);
 }
 
 void Strings::processCode(QString &code)
@@ -66,5 +78,5 @@ QString Strings::initialization()
 				.replace("@@INIT@@", chars);
 	}
 
-	return readTemplate("variables/constStringsInit.t").replace("@@STRINGS@@", init);
+	return init.isEmpty() ? "skip;" : readTemplate("variables/constStringsInit.t").replace("@@STRINGS@@", init);
 }

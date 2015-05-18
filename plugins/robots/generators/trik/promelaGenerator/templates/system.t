@@ -1,1 +1,1 @@
-skip; /*script.system(@@COMMAND@@);*/
+@@COMMAND@@
