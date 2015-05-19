@@ -1,4 +1,7 @@
-#include "defines"
+typedef string { int size; int a[8] };
+typedef data { int type; /*string s;*/ int i };
+typedef array { int size; data a[3] };
+typedef message { int size; int a[2] };
 
 /*threads channels*/
 #define mainproc 0

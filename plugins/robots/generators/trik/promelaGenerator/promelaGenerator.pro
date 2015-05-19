@@ -30,7 +30,8 @@ HEADERS += \
 	$$PWD/simpleGenerators/switchGenerator.h \
 	$$PWD/parts/strings.h \
 	$$PWD/simpleGenerators/variableInitGenerator.h \
-    simpleGenerators/ifGenerator.h
+	$$PWD/simpleGenerators/ifGenerator.h \
+	$$PWD/spin.h
 
 SOURCES += \
 	$$PWD/promelaGeneratorPlugin.cpp \
@@ -44,7 +45,8 @@ SOURCES += \
 	$$PWD/simpleGenerators/switchGenerator.cpp \
 	$$PWD/parts/strings.cpp \
 	$$PWD/simpleGenerators/variableInitGenerator.cpp \
-    simpleGenerators/ifGenerator.cpp
+	$$PWD/simpleGenerators/ifGenerator.cpp \
+	$$PWD/spin.cpp
 
 RESOURCES = \
 	$$PWD/templates.qrc \

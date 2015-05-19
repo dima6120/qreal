@@ -2,6 +2,8 @@
 
 #include <trikGeneratorBase/trikGeneratorPluginBase.h>
 
+#include "spin.h"
+
 namespace trik {
 namespace promela {
 
@@ -27,8 +29,12 @@ protected:
 	QString generatorName() const override;
 
 private:
+	void runVerifier(bool checked);
+
 	/// Action that launches code generator
 	QAction *mGenerateCodeAction;  // Doesn't have ownership; may be disposed by GUI.
+	QAction *mRunVerifierAction;
+	Spin *mSpin = nullptr;
 };
 
 }
