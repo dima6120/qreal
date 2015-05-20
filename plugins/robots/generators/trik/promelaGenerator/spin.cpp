@@ -5,8 +5,11 @@
 using namespace trik::promela;
 using namespace qReal;
 
-Spin::Spin(qReal::ErrorReporterInterface *errorReporter) :
-	mErrorReporter(errorReporter)
+Spin::Spin(CodeBlockManagerInterface *codeBlockManager, gui::MainWindowInterpretersInterface *mainWindow)
+	: mErrorReporter(mainWindow->errorReporter())
+	, mCodeBlockManager(codeBlockManager)
+	, mMainWindow(mainWindow)
+	, mTimer(new QTimer(this))
 {
 	QProcessEnvironment environment(QProcessEnvironment::systemEnvironment());
 	environment.insert("GCC", "C:/Qt/Qt5.3.1/Tools/mingw482_32/bin");
@@ -26,16 +29,29 @@ Spin::Spin(qReal::ErrorReporterInterface *errorReporter) :
 
 	mCounterexampleProcess.setProcessEnvironment(environment);
 	connect(&mCounterexampleProcess, finished, this, &Spin::counterexampleBuildingFinished);
+
+	connect(mTimer, &QTimer::timeout, this, &Spin::onTimeout);
 }
 
 void Spin::run(const QFileInfo &fileInfo)
 {
 	mFile = fileInfo;
+	mErrorReporter->addInformation(tr("Preparations for verification..."));
+	QFile::remove(qApp->applicationDirPath() + "/spin/" + mFile.fileName() + ".trail");
+	QFile::remove(qApp->applicationDirPath() + "/spin/counterexample");
 	mPromelaToCProcess.setStandardErrorFile(qApp->applicationDirPath() + "/spin/mPromelaToCProcess.err");
 	mPromelaToCProcess.setStandardOutputFile(qApp->applicationDirPath() + "/spin/mPromelaToCProcess.out");
 	mPromelaToCProcess.setEnvironment(QProcess::systemEnvironment());
 	mPromelaToCProcess.setWorkingDirectory(qApp->applicationDirPath() + "/spin/");
 	mPromelaToCProcess.start(qApp->applicationDirPath() + "/spin/spin.exe", QStringList() << "-a" << fileInfo.absoluteFilePath());
+}
+
+void Spin::highlightCounterexample()
+{
+	if (!mCounterexample.isEmpty()) {
+		mMainWindow->highlight(mCounterexample[0], false);
+		mTimer->start(1500);
+	}
 }
 
 void Spin::translationFinished(int exitCode, QProcess::ExitStatus exitStatus)
@@ -73,12 +89,24 @@ void Spin::correctCFile()
 	file.close();
 }
 
+void Spin::onTimeout()
+{
+	mMainWindow->dehighlight(mCounterexample[mCurrentBlock]);
+	mCurrentBlock++;
+
+	if (mCurrentBlock == mCounterexample.size()) {
+		mTimer->stop();
+	} else {
+		mMainWindow->highlight(mCounterexample[mCurrentBlock]);
+	}
+}
+
 void Spin::compileFinished(int exitCode, QProcess::ExitStatus exitStatus)
 {
 	Q_UNUSED(exitStatus)
 
 	if (exitCode == 0) {
-		QFile::remove(qApp->applicationDirPath() + "/spin/" + mFile.fileName() + ".trail");
+		mErrorReporter->addInformation(tr("Verification..."));
 		mVerificationProcess.setStandardErrorFile(qApp->applicationDirPath() + "/spin/mVerificationProcess.err");
 		mVerificationProcess.setStandardOutputFile(qApp->applicationDirPath() + "/spin/mVerificationProcess.out");
 		mVerificationProcess.setEnvironment(QProcess::systemEnvironment());
@@ -94,6 +122,7 @@ void Spin::compileError(QProcess::ProcessError error)
 
 void Spin::verificationFinished(int exitCode, QProcess::ExitStatus exitStatus)
 {
+	Q_UNUSED(exitCode)
 	Q_UNUSED(exitStatus)
 
 	QString const trailFileName = qApp->applicationDirPath() + "/spin/" + mFile.fileName() + ".trail";
@@ -119,25 +148,33 @@ void Spin::counterexampleBuildingFinished(int exitCode, QProcess::ExitStatus exi
 	QString const trailFileName = qApp->applicationDirPath() + "/spin/counterexample";
 	QString const pattern = "(:\\d+)";
 	QRegExp re(pattern);
-	QString resultTrail = "";
 	QFile trail(trailFileName);
+	int lastLineNumber = 0;
+
+	mCounterexample.clear();
+	mCurrentBlock = 0;
 
 	if (trail.open(QIODevice::ReadOnly))
 	{
 	   QTextStream in(&trail);
 		while (!in.atEnd()) {
-			QString const line = in.readLine();
-			int const pos = re.indexIn(line);
+			QString line = in.readLine();
+			int pos = re.indexIn(line);
 
 			if (pos > -1) {
-				resultTrail += re.cap().remove(":") + "\n";
+				int lineNumber = re.cap().remove(":").toInt();
+				if (lineNumber != lastLineNumber) {
+					lastLineNumber = lineNumber;
+					QList<Id> blocks = mCodeBlockManager->IdsByLineNumber(mFile.absoluteFilePath(), lineNumber);
+					if (!blocks.isEmpty()) {
+						mCounterexample.append(blocks.last());
+					}
+				}
 			} else {
 				break;
 			}
 		}
-		trail.close();
-		trail.open(QIODevice::WriteOnly);
-		trail.write(resultTrail.toUtf8());
+
 		trail.close();
 	}
 }

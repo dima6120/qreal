@@ -40,6 +40,8 @@ HEADERS += \
 	$$PWD/textManagerInterface.h \
 	$$PWD/qscintillaTextEdit.h \
 	$$PWD/languageInfo.h \
+	$$PWD/codeBlockManager.h \
+	$$PWD/codeBlockManagerInterface.h \
 
 SOURCES += \
 	$$PWD/textHighlighter.cpp \
@@ -47,3 +49,4 @@ SOURCES += \
 	$$PWD/textManager.cpp \
 	$$PWD/qscintillaTextEdit.cpp \
 	$$PWD/languageInfo.cpp \
+	$$PWD/codeBlockManager.cpp \

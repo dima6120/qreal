@@ -64,6 +64,7 @@
 #include <mouseGestures/gesturesWidget.h>
 
 #include <textEditor/textManager.h>
+#include <textEditor/codeBlockManager.h>
 #include <textEditor/qscintillaTextEdit.h>
 
 #include "qrealApplication.h"
@@ -1445,22 +1446,64 @@ void MainWindow::setIndexesOfPropertyEditor(const Id &id)
 
 void MainWindow::highlight(const Id &graphicalId, bool exclusive, const QColor &color)
 {
+	highlightCode(models().graphicalModelAssistApi().logicalId(graphicalId), true);
+
+	Id id = graphicalId;
+
+	if (models().logicalModelAssistApi().isLogicalId(graphicalId)) {
+		const IdList graphicalIds = models().graphicalModelAssistApi().graphicalIdsByLogicalId(graphicalId);
+		if (!graphicalIds.isEmpty()) {
+			id = graphicalIds.at(0);
+		}
+	}
+
 	for (int i = 0; i < mUi->tabs->count(); ++i) {
 		EditorView * const view = dynamic_cast<EditorView *>(mUi->tabs->widget(i));
 		if (!view) {
 			continue;
 		}
 		EditorViewScene * const scene = dynamic_cast<EditorViewScene *>(view->scene());
-		const Element * const element = scene->getElem(graphicalId);
+		const Element * const element = scene->getElem(id);
 		if (element) {
-			scene->highlight(graphicalId, exclusive, color);
+			mUi->tabs->setCurrentWidget(view);
+			scene->highlight(id, exclusive, color);
 			view->ensureElementVisible(element, 0, 0);
+		}
+	}
+}
+
+void MainWindow::highlightCode(Id const &graphicalId, bool highlight)
+{
+	text::QScintillaTextEdit *area = dynamic_cast<text::QScintillaTextEdit *>(currentTab());
+
+	if (area) {
+		if (highlight) {
+			QString const filePath = mTextManager->path(area);
+			QPair<int, int> const interval = mTextManager->codeBlockManager()->intervalById(filePath, graphicalId);
+			area->setMarkerBackgroundColor(QColor::fromRgb(0, 255, 0));
+			area->markerDefine(text::QScintillaTextEdit::Background, text::QScintillaTextEdit::SC_MARK_BACKGROUND);
+			for (int i = interval.first; i <= interval.second; i++) {
+				area->markerAdd(i - 1, text::QScintillaTextEdit::SC_MARK_BACKGROUND);
+			}
+		} else {
+			area->markerDeleteAll();
 		}
 	}
 }
 
 void MainWindow::dehighlight(const Id &graphicalId)
 {
+	highlightCode(models().graphicalModelAssistApi().logicalId(graphicalId), false);
+
+	Id id = graphicalId;
+
+	if (models().logicalModelAssistApi().isLogicalId(graphicalId)) {
+		const IdList graphicalIds = models().graphicalModelAssistApi().graphicalIdsByLogicalId(graphicalId);
+		if (!graphicalIds.isEmpty()) {
+			id = graphicalIds.at(0);
+		}
+	}
+
 	for (int i = 0; i < mUi->tabs->count(); ++i) {
 		EditorView * const view = dynamic_cast<EditorView *>(mUi->tabs->widget(i));
 		if (!view) {
@@ -1469,10 +1512,16 @@ void MainWindow::dehighlight(const Id &graphicalId)
 
 		EditorViewScene * const scene = dynamic_cast<EditorViewScene *>(view->scene());
 
-		if (graphicalId.isNull()) {
+		if (id.isNull()) {
 			scene->dehighlight();
 		} else {
-			scene->dehighlight(graphicalId);
+			scene->dehighlight(id);
+		}
+
+		for (text::QScintillaTextEdit *area : mTextManager->code(view->mvIface().rootId())) {
+			if (mTextManager->isDefaultPath(mTextManager->path(area))) {
+				area->markerDeleteAll();
+			}
 		}
 	}
 }

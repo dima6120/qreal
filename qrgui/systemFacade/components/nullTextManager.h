@@ -51,6 +51,8 @@ public:
 	bool saveText(bool saveAs) override;
 
 	QString generatorName(const QString &filepath) const override;
+
+	CodeBlockManagerInterface *codeBlockManager() override;
 };
 
 }

@@ -2,8 +2,12 @@
 
 #include <QtCore/QProcess>
 #include <QtCore/QFileInfo>
+#include <QtCore/QTimer>
 
+#include <qrgui/plugins/toolPluginInterface/usedInterfaces/mainWindowInterpretersInterface.h>
 #include <qrgui/plugins/toolPluginInterface/usedInterfaces/errorReporterInterface.h>
+#include <qrgui/textEditor/codeBlockManagerInterface.h>
+#include <qrrepo/repoApi.h>
 
 namespace trik {
 namespace promela {
@@ -13,9 +17,11 @@ class Spin : public QObject
 	Q_OBJECT
 
 public:
-	explicit Spin(qReal::ErrorReporterInterface *errorReporter);
+	Spin(qReal::CodeBlockManagerInterface *codeBlockManager
+			, qReal::gui::MainWindowInterpretersInterface *mainWindow);
 
 	void run(const QFileInfo &fileInfo);
+	void highlightCounterexample();
 
 private:
 	void translationFinished(int exitCode, QProcess::ExitStatus exitStatus);
@@ -29,13 +35,20 @@ private:
 	void counterexampleBuildingFinished(int exitCode, QProcess::ExitStatus exitStatus);
 
 	void correctCFile();
+	void onTimeout();
 
 	QProcess mPromelaToCProcess;
 	QProcess mCompileProcess;
 	QProcess mVerificationProcess;
 	QProcess mCounterexampleProcess;
 	qReal::ErrorReporterInterface *mErrorReporter;
+	qReal::CodeBlockManagerInterface *mCodeBlockManager;
+	qReal::gui::MainWindowInterpretersInterface *mMainWindow;
+
 	QFileInfo mFile;
+	QList<qReal::Id> mCounterexample;
+	int mCurrentBlock = 0;
+	QTimer *mTimer;
 };
 
 }

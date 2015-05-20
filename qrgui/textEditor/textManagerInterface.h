@@ -17,6 +17,7 @@
 #include <qrkernel/ids.h>
 
 #include "qrgui/textEditor/languageInfo.h"
+#include "qrgui/textEditor/codeBlockManagerInterface.h"
 
 class QFileInfo;
 
@@ -54,6 +55,7 @@ public:
 	virtual void showInTextEditor(const QFileInfo &fileInfo, const text::LanguageInfo &language) = 0;
 	virtual bool saveText(bool saveAs) = 0;
 	virtual QString generatorName(const QString &filepath) const  = 0;
+	virtual CodeBlockManagerInterface *codeBlockManager() = 0;
 
 signals:
 	void textChanged(bool changed);

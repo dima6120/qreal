@@ -129,3 +129,8 @@ QString NullTextManager::generatorName(const QString &filePath) const
 	Q_UNUSED(filePath)
 	return QString();
 }
+
+CodeBlockManagerInterface *NullTextManager::codeBlockManager()
+{
+	return nullptr;
+}

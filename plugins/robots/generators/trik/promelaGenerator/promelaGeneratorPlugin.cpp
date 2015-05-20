@@ -16,6 +16,7 @@ PromelaGeneratorPlugin::PromelaGeneratorPlugin()
 	: TrikGeneratorPluginBase("PromelaGeneratorRobotModel", tr("Generation (Promela)"), 7 /* Last order */)
 	, mGenerateCodeAction(new QAction(nullptr))
 	, mRunVerifierAction(new QAction(nullptr))
+	, mHighlightCounterexampleAction(new QAction(nullptr))
 {
 }
 
@@ -27,7 +28,7 @@ void PromelaGeneratorPlugin::init(kitBase::KitPluginConfigurator const &configur
 {
 	RobotsGeneratorPluginBase::init(configurator);
 
-	mSpin = new Spin(mMainWindowInterface->errorReporter());
+	mSpin = new Spin(mTextManager->codeBlockManager(), mMainWindowInterface);
 }
 
 QList<ActionInfo> PromelaGeneratorPlugin::customActions()
@@ -47,7 +48,13 @@ QList<ActionInfo> PromelaGeneratorPlugin::customActions()
 	connect(mRunVerifierAction, &QAction::triggered
 			, this, &PromelaGeneratorPlugin::runVerifier, Qt::UniqueConnection);
 
-	return {generateCodeActionInfo, runVerifierActionInfo, separatorInfo};
+	mHighlightCounterexampleAction->setText(tr("Show counterexample"));
+	//mGenerateCodeAction->setIcon(QIcon(":/images/generateQtsCode.svg"));
+	ActionInfo mHighlightCounterexampleActionInfo(mHighlightCounterexampleAction, "generators", "tools");
+	connect(mHighlightCounterexampleAction, &QAction::triggered
+			, this, &PromelaGeneratorPlugin::showCounterexample, Qt::UniqueConnection);
+
+	return {generateCodeActionInfo, runVerifierActionInfo, mHighlightCounterexampleActionInfo, separatorInfo};
 }
 
 QList<HotKeyActionInfo> PromelaGeneratorPlugin::hotKeyActions()
@@ -96,7 +103,6 @@ void PromelaGeneratorPlugin::runVerifier(bool checked)
 	Q_UNUSED(checked)
 
 	text::QScintillaTextEdit *area = dynamic_cast<text::QScintillaTextEdit *>(mMainWindowInterface->currentTab());
-
 	if (area) {
 		QString const filePath = mTextManager->path(area);
 		if (mTextManager->generatorName(filePath) == generatorName()) {
@@ -106,4 +112,11 @@ void PromelaGeneratorPlugin::runVerifier(bool checked)
 	}
 
 	mMainWindowInterface->errorReporter()->addError(tr("First open tab with Promela code"));
+}
+
+void PromelaGeneratorPlugin::showCounterexample(bool checked)
+{
+	Q_UNUSED(checked)
+
+	mSpin->highlightCounterexample();
 }
