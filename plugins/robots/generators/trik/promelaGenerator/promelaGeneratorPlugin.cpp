@@ -28,7 +28,8 @@ void PromelaGeneratorPlugin::init(kitBase::KitPluginConfigurator const &configur
 {
 	RobotsGeneratorPluginBase::init(configurator);
 
-	mSpin = new Spin(mTextManager->codeBlockManager(), mMainWindowInterface);
+	mSpin = new Spin(mTextManager->codeBlockManager(), mMainWindowInterface
+			, configurator.qRealConfigurator().graphicalModelApi());
 }
 
 QList<ActionInfo> PromelaGeneratorPlugin::customActions()

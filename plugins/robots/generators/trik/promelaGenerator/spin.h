@@ -6,6 +6,7 @@
 
 #include <qrgui/plugins/toolPluginInterface/usedInterfaces/mainWindowInterpretersInterface.h>
 #include <qrgui/plugins/toolPluginInterface/usedInterfaces/errorReporterInterface.h>
+#include <qrgui/plugins/toolPluginInterface/usedInterfaces/graphicalModelAssistInterface.h>
 #include <qrgui/textEditor/codeBlockManagerInterface.h>
 #include <qrrepo/repoApi.h>
 
@@ -18,7 +19,8 @@ class Spin : public QObject
 
 public:
 	Spin(qReal::CodeBlockManagerInterface *codeBlockManager
-			, qReal::gui::MainWindowInterpretersInterface *mainWindow);
+			, qReal::gui::MainWindowInterpretersInterface *mainWindow
+			, qReal::GraphicalModelAssistInterface &graphicalModelAssist);
 
 	void run(const QFileInfo &fileInfo);
 	void highlightCounterexample();
@@ -36,6 +38,7 @@ private:
 
 	void correctCFile();
 	void onTimeout();
+	qReal::Id graphicalId(qReal::Id logicalId);
 
 	QProcess mPromelaToCProcess;
 	QProcess mCompileProcess;
@@ -44,6 +47,7 @@ private:
 	qReal::ErrorReporterInterface *mErrorReporter;
 	qReal::CodeBlockManagerInterface *mCodeBlockManager;
 	qReal::gui::MainWindowInterpretersInterface *mMainWindow;
+	qReal::GraphicalModelAssistInterface &mGraphicalModelAssist;
 
 	QFileInfo mFile;
 	QList<qReal::Id> mCounterexample;

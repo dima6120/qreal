@@ -1448,25 +1448,16 @@ void MainWindow::highlight(const Id &graphicalId, bool exclusive, const QColor &
 {
 	highlightCode(models().graphicalModelAssistApi().logicalId(graphicalId), true);
 
-	Id id = graphicalId;
-
-	if (models().logicalModelAssistApi().isLogicalId(graphicalId)) {
-		const IdList graphicalIds = models().graphicalModelAssistApi().graphicalIdsByLogicalId(graphicalId);
-		if (!graphicalIds.isEmpty()) {
-			id = graphicalIds.at(0);
-		}
-	}
-
 	for (int i = 0; i < mUi->tabs->count(); ++i) {
 		EditorView * const view = dynamic_cast<EditorView *>(mUi->tabs->widget(i));
 		if (!view) {
 			continue;
 		}
 		EditorViewScene * const scene = dynamic_cast<EditorViewScene *>(view->scene());
-		const Element * const element = scene->getElem(id);
+		const Element * const element = scene->getElem(graphicalId);
 		if (element) {
 			mUi->tabs->setCurrentWidget(view);
-			scene->highlight(id, exclusive, color);
+			scene->highlight(graphicalId, exclusive, color);
 			view->ensureElementVisible(element, 0, 0);
 		}
 	}
@@ -1495,15 +1486,6 @@ void MainWindow::dehighlight(const Id &graphicalId)
 {
 	highlightCode(models().graphicalModelAssistApi().logicalId(graphicalId), false);
 
-	Id id = graphicalId;
-
-	if (models().logicalModelAssistApi().isLogicalId(graphicalId)) {
-		const IdList graphicalIds = models().graphicalModelAssistApi().graphicalIdsByLogicalId(graphicalId);
-		if (!graphicalIds.isEmpty()) {
-			id = graphicalIds.at(0);
-		}
-	}
-
 	for (int i = 0; i < mUi->tabs->count(); ++i) {
 		EditorView * const view = dynamic_cast<EditorView *>(mUi->tabs->widget(i));
 		if (!view) {
@@ -1512,10 +1494,10 @@ void MainWindow::dehighlight(const Id &graphicalId)
 
 		EditorViewScene * const scene = dynamic_cast<EditorViewScene *>(view->scene());
 
-		if (id.isNull()) {
+		if (graphicalId.isNull()) {
 			scene->dehighlight();
 		} else {
-			scene->dehighlight(id);
+			scene->dehighlight(graphicalId);
 		}
 
 		for (text::QScintillaTextEdit *area : mTextManager->code(view->mvIface().rootId())) {

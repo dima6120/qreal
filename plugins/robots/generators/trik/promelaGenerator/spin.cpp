@@ -5,10 +5,12 @@
 using namespace trik::promela;
 using namespace qReal;
 
-Spin::Spin(CodeBlockManagerInterface *codeBlockManager, gui::MainWindowInterpretersInterface *mainWindow)
+Spin::Spin(CodeBlockManagerInterface *codeBlockManager, gui::MainWindowInterpretersInterface *mainWindow
+		, GraphicalModelAssistInterface &graphicalModelAssist)
 	: mErrorReporter(mainWindow->errorReporter())
 	, mCodeBlockManager(codeBlockManager)
 	, mMainWindow(mainWindow)
+	, mGraphicalModelAssist(graphicalModelAssist)
 	, mTimer(new QTimer(this))
 {
 	QProcessEnvironment environment(QProcessEnvironment::systemEnvironment());
@@ -49,8 +51,14 @@ void Spin::run(const QFileInfo &fileInfo)
 void Spin::highlightCounterexample()
 {
 	if (!mCounterexample.isEmpty()) {
-		mMainWindow->highlight(mCounterexample[0], false);
-		mTimer->start(1500);
+		if (mCurrentBlock == 0) {
+			mMainWindow->highlight(graphicalId(mCounterexample[0]), false);
+			mTimer->start(1500);
+		} else {
+			mTimer->stop();
+			mMainWindow->dehighlight(graphicalId(mCounterexample[mCurrentBlock]));
+			mCurrentBlock = 0;
+		}
 	}
 }
 
@@ -91,14 +99,25 @@ void Spin::correctCFile()
 
 void Spin::onTimeout()
 {
-	mMainWindow->dehighlight(mCounterexample[mCurrentBlock]);
+	mMainWindow->dehighlight(graphicalId(mCounterexample[mCurrentBlock]));
 	mCurrentBlock++;
 
 	if (mCurrentBlock == mCounterexample.size()) {
 		mTimer->stop();
+		mCurrentBlock = 0;
 	} else {
-		mMainWindow->highlight(mCounterexample[mCurrentBlock]);
+		mMainWindow->highlight(graphicalId(mCounterexample[mCurrentBlock]));
 	}
+}
+
+Id Spin::graphicalId(Id logicalId)
+{
+	const IdList graphicalIds = mGraphicalModelAssist.graphicalIdsByLogicalId(logicalId);
+
+	if (!graphicalIds.isEmpty()) {
+		return graphicalIds.at(0);
+	}
+	return Id();
 }
 
 void Spin::compileFinished(int exitCode, QProcess::ExitStatus exitStatus)
