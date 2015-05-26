@@ -10,6 +10,8 @@
 #include <qrgui/textEditor/codeBlockManagerInterface.h>
 #include <qrrepo/repoApi.h>
 
+#include "ltlDialog.h"
+
 namespace trik {
 namespace promela {
 
@@ -24,6 +26,10 @@ public:
 
 	void run(const QFileInfo &fileInfo);
 	void highlightCounterexample();
+	void showLTLDialog();
+
+signals:
+	void formulaEntered(QString const &formula);
 
 private:
 	void translationFinished(int exitCode, QProcess::ExitStatus exitStatus);
@@ -53,6 +59,7 @@ private:
 	QList<qReal::Id> mCounterexample;
 	int mCurrentBlock = 0;
 	QTimer *mTimer;
+	LTLDialog *mLTLDialog;
 };
 
 }

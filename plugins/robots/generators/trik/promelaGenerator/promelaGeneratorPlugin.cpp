@@ -17,6 +17,7 @@ PromelaGeneratorPlugin::PromelaGeneratorPlugin()
 	, mGenerateCodeAction(new QAction(nullptr))
 	, mRunVerifierAction(new QAction(nullptr))
 	, mHighlightCounterexampleAction(new QAction(nullptr))
+	, mLTLEditorAction(new QAction(nullptr))
 {
 }
 
@@ -30,6 +31,8 @@ void PromelaGeneratorPlugin::init(kitBase::KitPluginConfigurator const &configur
 
 	mSpin = new Spin(mTextManager->codeBlockManager(), mMainWindowInterface
 			, configurator.qRealConfigurator().graphicalModelApi());
+
+	connect(mSpin, &Spin::formulaEntered, this, &PromelaGeneratorPlugin::pasteProperty);
 }
 
 QList<ActionInfo> PromelaGeneratorPlugin::customActions()
@@ -55,7 +58,13 @@ QList<ActionInfo> PromelaGeneratorPlugin::customActions()
 	connect(mHighlightCounterexampleAction, &QAction::triggered
 			, this, &PromelaGeneratorPlugin::showCounterexample, Qt::UniqueConnection);
 
-	return {generateCodeActionInfo, runVerifierActionInfo, mHighlightCounterexampleActionInfo, separatorInfo};
+	mLTLEditorAction->setText(tr("Enter checked property"));
+	//mGenerateCodeAction->setIcon(QIcon(":/images/generateQtsCode.svg"));
+	ActionInfo mLTLEditorActionInfo(mLTLEditorAction, "generators", "tools");
+	connect(mLTLEditorAction, &QAction::triggered
+			, this, &PromelaGeneratorPlugin::showLTLDialog, Qt::UniqueConnection);
+
+	return {generateCodeActionInfo, mLTLEditorActionInfo, runVerifierActionInfo, mHighlightCounterexampleActionInfo, separatorInfo};
 }
 
 QList<HotKeyActionInfo> PromelaGeneratorPlugin::hotKeyActions()
@@ -120,4 +129,25 @@ void PromelaGeneratorPlugin::showCounterexample(bool checked)
 	Q_UNUSED(checked)
 
 	mSpin->highlightCounterexample();
+}
+
+void PromelaGeneratorPlugin::showLTLDialog(bool checked)
+{
+	Q_UNUSED(checked)
+
+	mSpin->showLTLDialog();
+}
+
+void PromelaGeneratorPlugin::pasteProperty(const QString &formula)
+{
+	text::QScintillaTextEdit *area = dynamic_cast<text::QScintillaTextEdit *>(mMainWindowInterface->currentTab());
+	if (area) {
+		QString const filePath = mTextManager->path(area);
+		if (mTextManager->generatorName(filePath) == generatorName()) {
+			QString const pattern =
+					"[/][*][@][@](\\bLTL_BEGIN\\b)[@][@][*][/](.*)[/][*][@][@](\\bLTL_END\\b)[@][@][*][/]";
+			area->setText(area->text().replace(QRegExp(pattern),
+					"/*@@LTL_BEGIN@@*/\nltl l1 {" + formula +"}\n/*@@LTL_END@@*/"));
+		}
+	}
 }

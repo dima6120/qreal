@@ -1,9 +1,12 @@
 #include "spin.h"
 
+#include <qrutils/inFile.h>
+#include <qrutils/outFile.h>
 #include <QtCore/QCoreApplication>
 
 using namespace trik::promela;
 using namespace qReal;
+using namespace utils;
 
 Spin::Spin(CodeBlockManagerInterface *codeBlockManager, gui::MainWindowInterpretersInterface *mainWindow
 		, GraphicalModelAssistInterface &graphicalModelAssist)
@@ -12,6 +15,7 @@ Spin::Spin(CodeBlockManagerInterface *codeBlockManager, gui::MainWindowInterpret
 	, mMainWindow(mainWindow)
 	, mGraphicalModelAssist(graphicalModelAssist)
 	, mTimer(new QTimer(this))
+	, mLTLDialog(new LTLDialog(mainWindow->windowWidget()))
 {
 	QProcessEnvironment environment(QProcessEnvironment::systemEnvironment());
 	environment.insert("GCC", "C:/Qt/Qt5.3.1/Tools/mingw482_32/bin");
@@ -33,6 +37,8 @@ Spin::Spin(CodeBlockManagerInterface *codeBlockManager, gui::MainWindowInterpret
 	connect(&mCounterexampleProcess, finished, this, &Spin::counterexampleBuildingFinished);
 
 	connect(mTimer, &QTimer::timeout, this, &Spin::onTimeout);
+	connect(mLTLDialog, &LTLDialog::okButtonPressed
+			, [this](QString const &formula) { emit formulaEntered(formula); });
 }
 
 void Spin::run(const QFileInfo &fileInfo)
@@ -62,6 +68,11 @@ void Spin::highlightCounterexample()
 	}
 }
 
+void Spin::showLTLDialog()
+{
+	mLTLDialog->exec();
+}
+
 void Spin::translationFinished(int exitCode, QProcess::ExitStatus exitStatus)
 {
 	Q_UNUSED(exitStatus)
@@ -85,16 +96,13 @@ void Spin::errorWhileTranslating(QProcess::ProcessError error)
 
 void Spin::correctCFile()
 {
-	QByteArray fileData;
-	QFile file(qApp->applicationDirPath() + "/spin/pan.c");
-	file.open(QIODevice::ReadOnly);
-	fileData = file.readAll();
-	QString text(fileData);
-	file.close();
+	QString const path = qApp->applicationDirPath() + "/spin/pan.c";
+	qDebug() << path;
+	QString text = InFile::readAll(path);
 	text.replace("random(", "rand(");
-	file.open(QIODevice::WriteOnly);
-	file.write(text.toUtf8());
-	file.close();
+	OutFile out(path);
+	out() << text;
+	out.flush();
 }
 
 void Spin::onTimeout()

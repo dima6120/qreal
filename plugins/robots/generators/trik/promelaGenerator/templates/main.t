@@ -33,4 +33,7 @@ init
 	run main();
 }
 
-@@NEVER@@
+/*@@LTL_BEGIN@@*/
+/*@@LTL_END@@*/
+
+
