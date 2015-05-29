@@ -1,1 +1,1 @@
-	copyStr(@@VARIABLE@@.a[@@INDEX@@]@@S@@, @@VALUE@@);
+	copyStr(@@VARIABLE@@.a[@@INDEX@@], @@VALUE@@);

@@ -36,18 +36,23 @@ QString ReceiveMessageThreadsGenerator::templateSelection(const qrRepo::RepoApi 
 		, generatorBase::GeneratorCustomizer &customizer, const qReal::Id &id)
 {
 	QString const variable = repo.property(id, "Variable").toString();
-	qrtext::core::types::TypeExpression *type = customizer.factory()->variables()->expressionType(variable).data();
+	QSharedPointer<qrtext::core::types::TypeExpression> type = customizer.factory()->variables()
+			->expressionType(variable);
 	PromelaGeneratorFactory *factory = dynamic_cast<PromelaGeneratorFactory *>(customizer.factory());
 
-	if (dynamic_cast<Table *>(type) != nullptr) {
+	if (type.data()->is<Table>()) {
+		QSharedPointer<Table> table = type.dynamicCast<Table>();
 		factory->strings().setChannelType(customizer.factory()->subprograms()->currentControlFlow()->threadId()
-				, !dynamic_cast<Table *>(type)->elementType().dynamicCast<String>().isNull());
+				, table.data()->elementType().data()->is<String>());
+
 		return "receiveMessage.t";
-	} else if (dynamic_cast<String *>(type) != nullptr) {
-		factory->strings().setChannelType(customizer.factory()->subprograms()->currentControlFlow()->threadId(), true);
+	} else if (type.data()->is<String>()) {
+		factory->strings().setChannelType(customizer.factory()->subprograms()->currentControlFlow()->threadId()
+				, true);
 		return "receiveMessageString.t";
 	} else {
-		factory->strings().setChannelType(customizer.factory()->subprograms()->currentControlFlow()->threadId(), false);
+		factory->strings().setChannelType(customizer.factory()->subprograms()->currentControlFlow()->threadId()
+				, false);
 		return "receiveMessageInt.t";
 	}
 }
@@ -56,18 +61,19 @@ QString ReceiveMessageThreadsGenerator::assignment(const qrRepo::RepoApi &repo
 		, generatorBase::GeneratorCustomizer &customizer, const qReal::Id &id)
 {
 	QString const variable = repo.property(id, "Variable").toString();
-	qrtext::core::types::TypeExpression *type = customizer.factory()->variables()->expressionType(variable).data();
-	Table *table = dynamic_cast<Table *>(type);
+	QSharedPointer<qrtext::core::types::TypeExpression> type = customizer.factory()->variables()
+			->expressionType(variable);
+	QSharedPointer<Table> table = type.dynamicCast<Table>();
 
-	if (table != nullptr) {
-		if (!table->elementType().dynamicCast<String>().isNull()) {
+	if (!table.isNull()) {
+		if (table.data()->elementType().data()->is<String>()) {
 			return QString("copyStr(@@VARIABLE@@, @@VALUE@@)")
-					.replace("@@VARIABLE@@", variable + ".a[receive_i].s")
+					.replace("@@VARIABLE@@", variable + ".a[receive_i]")
 					.replace("@@VALUE@@",
 						repo.stringProperty(repo.outgoingLinks(id).at(0), "Guard") + "proc_strings[receive_i]");
 		} else {
 			return QString("@@VARIABLE@@ = @@VALUE@@")
-					.replace("@@VARIABLE@@", variable + ".a[receive_i].i")
+					.replace("@@VARIABLE@@", variable + ".a[receive_i]")
 					.replace("@@VALUE@@", "temp.a[receive_i]");
 		}
 	}

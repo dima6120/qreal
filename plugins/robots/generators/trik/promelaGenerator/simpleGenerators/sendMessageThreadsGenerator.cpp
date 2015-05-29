@@ -30,9 +30,7 @@ SendMessageThreadsGenerator::SendMessageThreadsGenerator(const qrRepo::RepoApi &
 					, isInt(repo, customizer, id) ? "temp"
 					: customizer.factory()->subprograms()->currentControlFlow()->threadId() + "proc_strings")
 				, Binding::createStatic("@@SIZE@@"
-					, QString::number(repo.property(id, "Message").toString().count(",") + 1))
-				, Binding::createStatic("@@I@@", "")
-				, Binding::createStatic("@@S@@", "")}
+					, QString::number(repo.property(id, "Message").toString().count(",") + 1))}
 			, parent)
 {
 }
@@ -41,18 +39,21 @@ QString SendMessageThreadsGenerator::templateSelection(const qrRepo::RepoApi &re
 		, generatorBase::GeneratorCustomizer &customizer, const qReal::Id &id)
 {
 	QString const message = repo.property(id, "Message").toString();
-	qrtext::core::types::TypeExpression *type = customizer.factory()->variables()->expressionType(message).data();
+	QSharedPointer<qrtext::core::types::TypeExpression> type = customizer.factory()->variables()
+			->expressionType(message);
 	PromelaGeneratorFactory *factory = dynamic_cast<PromelaGeneratorFactory *>(customizer.factory());
 
-	if (dynamic_cast<Table *>(type) != nullptr) {
+	if (type.data()->is<Table>()) {
+		QSharedPointer<Table> table = type.dynamicCast<Table>();
 		factory->strings().setChannelType(repo.property(id, "Thread").toString()
-				, !dynamic_cast<Table *>(type)->elementType().dynamicCast<String>().isNull());
+				, table.data()->elementType().data()->is<String>());
+
 		if (message.contains("{")) {
 			return "sendMessageTableConstructor.t";
 		} else {
 			return "sendMessage.t";
 		}
-	} else if (dynamic_cast<String *>(type) != nullptr) {
+	} else if (type.data()->is<String>()) {
 		factory->strings().setChannelType(repo.property(id, "Thread").toString(), true);
 		return "sendMessageString.t";
 	} else {
@@ -65,10 +66,11 @@ bool SendMessageThreadsGenerator::isInt(const qrRepo::RepoApi &repo
 		, generatorBase::GeneratorCustomizer &customizer, const qReal::Id &id)
 {
 	QString const message = repo.property(id, "Message").toString();
-	qrtext::core::types::TypeExpression *type = customizer.factory()->variables()->expressionType(message).data();
-	bool const isInteger = dynamic_cast<Integer *>(type) != nullptr;
-	Table *table = dynamic_cast<Table *>(type);
-	bool const isIntTable = table != nullptr && !table->elementType().dynamicCast<Integer>().isNull();
+	QSharedPointer<qrtext::core::types::TypeExpression> type = customizer.factory()->variables()
+			->expressionType(message);
+	bool const isInteger = type.data()->is<Integer>();
+	QSharedPointer<Table> table = type.dynamicCast<Table>();
+	bool const isIntTable = !table.isNull() && table.data()->elementType().data()->is<Integer>();
 
 	return isInteger || isIntTable;
 }

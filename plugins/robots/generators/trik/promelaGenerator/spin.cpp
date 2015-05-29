@@ -59,7 +59,7 @@ void Spin::highlightCounterexample()
 	if (!mCounterexample.isEmpty()) {
 		if (mCurrentBlock == 0) {
 			mMainWindow->highlight(graphicalId(mCounterexample[0]), false);
-			mTimer->start(1500);
+			mTimer->start(400);
 		} else {
 			mTimer->stop();
 			mMainWindow->dehighlight(graphicalId(mCounterexample[mCurrentBlock]));
@@ -176,7 +176,6 @@ void Spin::counterexampleBuildingFinished(int exitCode, QProcess::ExitStatus exi
 	QString const pattern = "(:\\d+)";
 	QRegExp re(pattern);
 	QFile trail(trailFileName);
-	int lastLineNumber = 0;
 
 	mCounterexample.clear();
 	mCurrentBlock = 0;
@@ -190,18 +189,14 @@ void Spin::counterexampleBuildingFinished(int exitCode, QProcess::ExitStatus exi
 
 			if (pos > -1) {
 				int lineNumber = re.cap().remove(":").toInt();
-				if (lineNumber != lastLineNumber) {
-					lastLineNumber = lineNumber;
-					QList<Id> blocks = mCodeBlockManager->IdsByLineNumber(mFile.absoluteFilePath(), lineNumber);
-					if (!blocks.isEmpty()) {
-						mCounterexample.append(blocks.last());
-					}
+				QList<Id> blocks = mCodeBlockManager->IdsByLineNumber(mFile.absoluteFilePath(), lineNumber);
+				if (!blocks.isEmpty()) {
+					mCounterexample.append(blocks.last());
 				}
 			} else {
 				break;
 			}
 		}
-
 		trail.close();
 	}
 }

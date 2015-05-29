@@ -1,1 +1,1 @@
-array
+@@ELEMENT_TYPE@@Array

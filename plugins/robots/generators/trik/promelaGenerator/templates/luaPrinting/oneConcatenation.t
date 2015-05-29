@@ -1,3 +1,3 @@
 	@@CONCATENATION@@
 	string t@@NUMBER@@;
-	concatStr(t@@NUMBER@@, @@LEFT@@, @@RIGHT@@);		
+	concatStr(t@@NUMBER@@, @@LEFT@@, @@RIGHT@@);

@@ -1,1 +1,1 @@
-copyStr(@@VARIABLE@@, @@VALUE@@)
+	copyStr(@@VARIABLE@@, @@VALUE@@)

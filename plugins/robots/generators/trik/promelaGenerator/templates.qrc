@@ -215,8 +215,6 @@
         <file>templates/luaPrinting/stringAssignment1.t</file>
         <file>templates/luaPrinting/stringAssignment2.t</file>
         <file>templates/luaPrinting/implicitKeyStringFieldInitialization.t</file>
-        <file>templates/luaPrinting/indexingExpressionIntType.t</file>
-        <file>templates/luaPrinting/indexingExpressionStringType.t</file>
         <file>templates/threads/sendMessageInt.t</file>
         <file>templates/threads/sendMessageString.t</file>
         <file>templates/threads/sendMessageTableConstructor.t</file>

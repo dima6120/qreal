@@ -69,7 +69,7 @@ void PromelaLuaPrinter::setReservedVariablesConverter(
 
 void PromelaLuaPrinter::visit(const Assignment &node)
 {
-	if (!node.value().dynamicCast<TableConstructor>().isNull()) {
+	if (node.value().data()->is<TableConstructor>()) {
 		if (mDeadNodes.contains(node.value().data())) {
 			Identifier *id = dynamic_cast<Identifier *>(node.variable().data());
 			mDeadVariables.insert(id->name());
@@ -78,10 +78,10 @@ void PromelaLuaPrinter::visit(const Assignment &node)
 			processTemplate(node, "arrayAssignment.t", { {"@@INITIALIZERS@@", node.value()}
 					, {"@@VARIABLE@@", node.variable()}});
 			pushResult(node, popResult(node).replace("@@SIZE@@"
-					, QString::number(dynamic_cast<TableConstructor *>(node.value().data())->initializers().size()))
-					.replace("@@I@@", ".i").replace("@@S@@", ".s"));
+					, QString::number(dynamic_cast<TableConstructor *>
+						(node.value().data())->initializers().size())));
 		}
-	} else if (!node.value().dynamicCast<Concatenation>().isNull()){
+	} else if (node.value().data()->is<Concatenation>()){
 		//todo: dead node
 		mTempStringNumber = 0;
 		processTemplate(node, "stringAssignment1.t", { {"@@CONCATENATIONS@@", node.value()}
@@ -95,11 +95,11 @@ void PromelaLuaPrinter::visit(const Assignment &node)
 	} else {
 		if (mDeadNodes.contains(node.value().data())) {
 			QString var;
-			if (!node.variable().dynamicCast<Identifier>().isNull()) {
-				var = dynamic_cast<Identifier *>(node.variable().data())->name();
+			if (node.variable().data()->is<Identifier>()) {
+				var = node.variable().dynamicCast<Identifier>().data()->name();
 			} else {
-				var = dynamic_cast<Identifier *>(
-						dynamic_cast<IndexingExpression *>(node.variable().data())->table().data())->name();
+				var = node.variable().dynamicCast<IndexingExpression>().data()
+						->table().dynamicCast<Identifier>().data()->name();
 			}
 			mDeadVariables.insert(var);
 			processTemplate(node, "skip.t", { {"@@VALUE@@", node.value()}, {"@@VARIABLE@@", node.variable()} });
@@ -111,19 +111,19 @@ void PromelaLuaPrinter::visit(const Assignment &node)
 
 bool PromelaLuaPrinter::stringAssignment(const Assignment &node)
 {
-	if (!node.value().dynamicCast<String>().isNull()) {
+	if (node.value().data()->is<String>()) {
 		return true;
-	} else if (!node.value().dynamicCast<Identifier>().isNull()) {
-		QString const id = dynamic_cast<Identifier *>(node.variable().data())->name();
+	} else if (node.value().data()->is<Identifier>()) {
+		QString const id = node.variable().dynamicCast<Identifier>().data()->name();
 
-		return !mCustomizer.factory()->variables()->expressionType(id).dynamicCast<types::String>().isNull();
-	} else if (!node.value().dynamicCast<IndexingExpression>().isNull()) {
-		QString const tableId = dynamic_cast<Identifier *>(
-				dynamic_cast<IndexingExpression *>(node.value().data())->table().data())->name();
+		return mCustomizer.factory()->variables()->expressionType(id).data()->is<types::String>();
+	} else if (node.value().data()->is<IndexingExpression>()) {
+		QString const tableId = node.value().dynamicCast<IndexingExpression>().data()
+				->table().dynamicCast<Identifier>().data()->name();
+		QSharedPointer<core::types::TypeExpression> type = mCustomizer.factory()
+				->variables()->expressionType(tableId);
 
-		core::types::TypeExpression *type = mCustomizer.factory()->variables()->expressionType(tableId).data();
-
-		return !dynamic_cast<types::Table *>(type)->elementType().dynamicCast<types::String>().isNull();
+		return type.dynamicCast<types::Table>().data()->elementType().data()->is<types::String>();
 	}
 
 	return false;
@@ -153,15 +153,14 @@ void PromelaLuaPrinter::visit(const TableConstructor &node)
 	}
 
 	pushResult(node, readTemplate("tableConstructor.t")
-			//.replace("@@SIZE@@", QString::number(initializers.size()))
 			.replace("@@INITIALIZERS@@", initializers.join(readTemplate("fieldInitializersSeparator.t"))));
 }
 
 
 void PromelaLuaPrinter::visit(const Concatenation &node)
 {
-	bool const rightConcat = !node.rightOperand().dynamicCast<Concatenation>().isNull();
-	bool const leftConcat = !node.leftOperand().dynamicCast<Concatenation>().isNull();
+	bool const rightConcat = node.rightOperand().data()->is<Concatenation>();
+	bool const leftConcat = node.leftOperand().data()->is<Concatenation>();
 
 	pushResult(node, readTemplate("oneConcatenation.t")
 			.replace("@@LEFT@@"
@@ -201,7 +200,7 @@ void PromelaLuaPrinter::visit(const FieldInitialization &node)
 
 void PromelaLuaPrinter::visit(const IndexingExpression &node)
 {
-	QString const name = dynamic_cast<Identifier *>(node.table().data())->name();
+	QString const name = node.table().dynamicCast<Identifier>().data()->name();
 
 	if (mDeadVariables.contains(name) || mDeadNodes.contains(node.indexer().data())) {
 		mDeadNodes.insert(&node);
@@ -211,14 +210,11 @@ void PromelaLuaPrinter::visit(const IndexingExpression &node)
 		return;
 	}
 
-	core::types::TypeExpression *type = mCustomizer.factory()->variables()->expressionType(name).data();
-	types::Table *table = dynamic_cast<types::Table *>(type);
+	QSharedPointer<core::types::TypeExpression> type = mCustomizer.factory()->variables()->expressionType(name);
 
-	if (table != nullptr) {
+	if (type.data()->is<types::Table>()) {
 		//todo: what about float?
-		processTemplate(node, !table->elementType().dynamicCast<types::String>().isNull()
-				? "indexingExpressionStringType.t"
-				: "indexingExpressionIntType.t"
+		processTemplate(node, "indexingExpression.t"
 				, { {"@@TABLE@@", node.table()}, {"@@INDEXER@@", node.indexer()} });
 	} else {
 		LuaPrinter::visit(node);
@@ -227,11 +223,12 @@ void PromelaLuaPrinter::visit(const IndexingExpression &node)
 
 bool PromelaLuaPrinter::allowedTable(const QString &name)
 {
-	types::Table *table = dynamic_cast<types::Table *>(mCustomizer.factory()->variables()->expressionType(name).data());
+	QSharedPointer<types::Table> table = mCustomizer.factory()->variables()->expressionType(name)
+			.dynamicCast<types::Table>();
 
-	if (table != nullptr) {
-		bool const stringType = !table->elementType().dynamicCast<types::String>().isNull();
-		bool const intType = !table->elementType().dynamicCast<types::Integer>().isNull();
+	if (!table.isNull()) {
+		bool const stringType = table.data()->elementType().data()->is<types::String>();
+		bool const intType = table.data()->elementType().data()->is<types::Integer>();
 
 		return stringType || intType;
 	}

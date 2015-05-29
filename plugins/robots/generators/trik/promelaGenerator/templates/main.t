@@ -1,6 +1,7 @@
 typedef string { int size; int a[8] };
-typedef data { int type; /*string s;*/ int i };
-typedef array { int size; data a[3] };
+typedef intArray { int size; int a[2] }
+typedef boolArray {int size; bool a[2] }
+typedef stringArray { int size; string a[2] };
 typedef message { int size; int a[2] };
 
 /*threads channels*/

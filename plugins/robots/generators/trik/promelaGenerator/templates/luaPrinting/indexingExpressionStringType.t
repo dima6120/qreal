@@ -1,1 +1,0 @@
-@@TABLE@@.a[@@INDEXER@@].s

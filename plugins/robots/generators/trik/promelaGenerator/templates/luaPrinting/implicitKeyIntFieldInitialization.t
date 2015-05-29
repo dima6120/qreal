@@ -1,1 +1,1 @@
-	@@VARIABLE@@.a[@@INDEX@@]@@I@@ = @@VALUE@@;
+	@@VARIABLE@@.a[@@INDEX@@] = @@VALUE@@;
