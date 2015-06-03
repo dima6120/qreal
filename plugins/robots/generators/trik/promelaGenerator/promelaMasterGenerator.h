@@ -18,6 +18,7 @@ public:
 
 protected:
 	QString targetPath() override;
+	void beforeGeneration() override;
 	bool supportsGotoGeneration() const override;
 	void processGeneratedCode(QString &generatedCode) override;
 	generatorBase::GeneratorCustomizer *createCustomizer() override;
@@ -25,6 +26,7 @@ protected:
 
 private:
 	QString generateThreadsChannels();
+	void generateThreadNames();
 
 	const QString mGeneratorName;
 };

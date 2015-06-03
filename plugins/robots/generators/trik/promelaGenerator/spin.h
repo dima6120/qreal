@@ -57,6 +57,7 @@ private:
 
 	QFileInfo mFile;
 	QList<qReal::Id> mCounterexample;
+	QMap<qReal::Id, QString> mBlockThread;
 	int mCurrentBlock = 0;
 	QTimer *mTimer;
 	LTLDialog *mLTLDialog;

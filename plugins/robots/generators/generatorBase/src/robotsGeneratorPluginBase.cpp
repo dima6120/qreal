@@ -123,7 +123,7 @@ QFileInfo RobotsGeneratorPluginBase::generateCodeForProcessing()
 	const Id &activeDiagram = mMainWindowInterface->activeDiagram();
 
 	if (!activeDiagram.isNull()) {
-		if (generateCode(false)) {
+		if (!generateCode(false).isEmpty()) {
 			foreach (const QFileInfo &path, mCodePath.values(activeDiagram)) {
 				if (mTextManager->isDefaultPath(path.absoluteFilePath())
 					&& (!mTextManager->isModifiedEver(path.absoluteFilePath()))
@@ -175,7 +175,7 @@ QString RobotsGeneratorPluginBase::friendlyKitName() const
 	return QString();
 }
 
-bool RobotsGeneratorPluginBase::generateCode(bool openTab)
+QString RobotsGeneratorPluginBase::generateCode(bool openTab)
 {
 	mProjectManager->save();
 	/// @todo: clearErrors() and clear() are absolutely different methods without documentation - wtf?
@@ -192,7 +192,7 @@ bool RobotsGeneratorPluginBase::generateCode(bool openTab)
 
 	if (mMainWindowInterface->errorReporter()->wereErrors()) {
 		delete generator;
-		return false;
+		return QString();
 	}
 
 	const Id activeDiagram = mMainWindowInterface->activeDiagram();
@@ -207,7 +207,7 @@ bool RobotsGeneratorPluginBase::generateCode(bool openTab)
 	}
 
 	delete generator;
-	return true;
+	return generatedSrcPath;
 }
 
 void RobotsGeneratorPluginBase::regenerateCode(const qReal::Id &diagram

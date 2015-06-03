@@ -31,9 +31,9 @@
     </spacer>
    </item>
    <item row="1" column="1">
-    <widget class="QPushButton" name="okButton">
+    <widget class="QPushButton" name="runVerifierButton">
      <property name="text">
-      <string>OK</string>
+      <string>Run Verifier</string>
      </property>
     </widget>
    </item>

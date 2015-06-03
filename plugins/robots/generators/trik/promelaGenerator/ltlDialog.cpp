@@ -8,7 +8,7 @@ LTLDialog::LTLDialog(QWidget *parent) :
 	setWindowFlags(windowFlags() & ~Qt::WindowContextHelpButtonHint & ~Qt::WindowCloseButtonHint);
 	ui->setupUi(this);
 
-	connect(ui->okButton, &QPushButton::pressed, this, &LTLDialog::onOkButtonPress);
+	connect(ui->runVerifierButton, &QPushButton::pressed, this, &LTLDialog::onRunVerifierButtonPress);
 	connect(ui->cancelButton, &QPushButton::pressed, this, &QDialog::hide);
 }
 
@@ -17,8 +17,8 @@ LTLDialog::~LTLDialog()
 	delete ui;
 }
 
-void LTLDialog::onOkButtonPress()
+void LTLDialog::onRunVerifierButtonPress()
 {
-	emit okButtonPressed(ui->ltlTextEdit->toPlainText());
 	this->hide();
+	emit runVerifierButtonPressed(ui->ltlTextEdit->toPlainText());
 }

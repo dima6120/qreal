@@ -1,6 +1,10 @@
 #include "promelaMasterGenerator.h"
 
+#include <QtCore/QCoreApplication>
 #include <generatorBase/parts/threads.h>
+#include <qrutils/nameNormalizer.h>
+#include <qrutils/outFile.h>
+#include <qrutils/inFile.h>
 
 #include "parts/strings.h"
 #include "promelaGeneratorCustomizer.h"
@@ -27,9 +31,15 @@ QString PromelaMasterGenerator::targetPath()
 	return QString("%1/%2.pml").arg(mProjectDir, mProjectName);
 }
 
+void PromelaMasterGenerator::beforeGeneration()
+{
+	mErrorReporter.addInformation(tr("Preparations for verification..."));
+}
+
 void PromelaMasterGenerator::processGeneratedCode(QString &generatedCode)
 {
 	generatedCode.replace("@@CHANNELS@@", generateThreadsChannels());
+	generateThreadNames();
 	dynamic_cast<PromelaGeneratorFactory *> (mCustomizer->factory())->strings().processCode(generatedCode);
 }
 
@@ -67,6 +77,24 @@ QString PromelaMasterGenerator::generateThreadsChannels()
 	channels += (stringChan ? readTemplate("defineProcessStringBuffer.t").replace("@@NAME@@", "main") : "") + "\n";
 
 	return defines + "\n" + channels;
+}
+
+void PromelaMasterGenerator::generateThreadNames()
+{
+	QString src = utils::InFile::readAll(targetPath());
+	QRegExp re("(TASK[_]\\w+)[(][)][;]\\s[/][*](\\w+)[*][/]");
+	utils::OutFile out(qApp->applicationDirPath() + "/spin/threadNames");
+
+	for (QString const &line : src.split("\n")) {
+		int const pos = re.indexIn(line);
+
+		if (pos > -1) {
+			QString const id = re.cap(1);
+			QString const name = re.cap(2);
+
+			out() << id + " " + name + "\n";
+		}
+	}
 }
 
 bool PromelaMasterGenerator::supportsGotoGeneration() const

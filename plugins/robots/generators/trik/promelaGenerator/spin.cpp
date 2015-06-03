@@ -37,14 +37,13 @@ Spin::Spin(CodeBlockManagerInterface *codeBlockManager, gui::MainWindowInterpret
 	connect(&mCounterexampleProcess, finished, this, &Spin::counterexampleBuildingFinished);
 
 	connect(mTimer, &QTimer::timeout, this, &Spin::onTimeout);
-	connect(mLTLDialog, &LTLDialog::okButtonPressed
+	connect(mLTLDialog, &LTLDialog::runVerifierButtonPressed
 			, [this](QString const &formula) { emit formulaEntered(formula); });
 }
 
 void Spin::run(const QFileInfo &fileInfo)
 {
 	mFile = fileInfo;
-	mErrorReporter->addInformation(tr("Preparations for verification..."));
 	QFile::remove(qApp->applicationDirPath() + "/spin/" + mFile.fileName() + ".trail");
 	QFile::remove(qApp->applicationDirPath() + "/spin/counterexample");
 	mPromelaToCProcess.setStandardErrorFile(qApp->applicationDirPath() + "/spin/mPromelaToCProcess.err");
@@ -58,7 +57,10 @@ void Spin::highlightCounterexample()
 {
 	if (!mCounterexample.isEmpty()) {
 		if (mCurrentBlock == 0) {
+			mErrorReporter->clear();
+			mErrorReporter->clearErrors();
 			mMainWindow->highlight(graphicalId(mCounterexample[0]), false);
+			mErrorReporter->addInformation("Current thread: " + mBlockThread.value(mCounterexample[0]));
 			mTimer->start(400);
 		} else {
 			mTimer->stop();
@@ -115,6 +117,7 @@ void Spin::onTimeout()
 		mCurrentBlock = 0;
 	} else {
 		mMainWindow->highlight(graphicalId(mCounterexample[mCurrentBlock]));
+		mErrorReporter->addInformation("Current thread: " + mBlockThread.value(mCounterexample[mCurrentBlock]));
 	}
 }
 
@@ -173,30 +176,47 @@ void Spin::counterexampleBuildingFinished(int exitCode, QProcess::ExitStatus exi
 	Q_UNUSED(exitCode)
 
 	QString const trailFileName = qApp->applicationDirPath() + "/spin/counterexample";
-	QString const pattern = "(:\\d+)";
-	QRegExp re(pattern);
-	QFile trail(trailFileName);
+	QString const threadNamesFileName = qApp->applicationDirPath() + "/spin/threadNames";
+	QString const lineNumberPattern = "(:\\d+)";
+	QString const processIdPattern = "((main)|([(]TASK[_]\\w+[)]))";
+	QRegExp re;
+	QMap<QString, QString> threadNames;
+	int lastNumber = 0;
 
 	mCounterexample.clear();
 	mCurrentBlock = 0;
 
-	if (trail.open(QIODevice::ReadOnly))
-	{
-	   QTextStream in(&trail);
-		while (!in.atEnd()) {
-			QString line = in.readLine();
-			int pos = re.indexIn(line);
+	threadNames.insert("main", "main");
 
-			if (pos > -1) {
-				int lineNumber = re.cap().remove(":").toInt();
+	for (QString const &line : utils::InFile::readAll(threadNamesFileName).split("\n")) {
+		QStringList thread = line.split(" ");
+		if (!line.isEmpty()) {
+			threadNames.insert(thread[0], thread[1]);
+		}
+	}
+
+	for (QString const &line : utils::InFile::readAll(trailFileName).split("\n")) {
+		re.setPattern(lineNumberPattern);
+		int pos = re.indexIn(line);
+
+		if (pos > -1) {
+			int lineNumber = re.cap().remove(":").toInt();
+			if (lineNumber != lastNumber) {
 				QList<Id> blocks = mCodeBlockManager->IdsByLineNumber(mFile.absoluteFilePath(), lineNumber);
 				if (!blocks.isEmpty()) {
 					mCounterexample.append(blocks.last());
+					re.setPattern(processIdPattern);
+					pos = re.indexIn(line);
+
+					if (pos > -1) {
+						QString const threadId = re.cap().remove(QRegExp("[()]"));
+						mBlockThread.insert(blocks.last(), threadNames.value(threadId));
+					}
 				}
-			} else {
-				break;
+				lastNumber = lineNumber;
 			}
+		} else {
+			break;
 		}
-		trail.close();
 	}
 }

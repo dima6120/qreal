@@ -29,14 +29,10 @@ protected:
 	QString generatorName() const override;
 
 private:
-	void runVerifier(bool checked);
 	void showCounterexample(bool checked);
 	void showLTLDialog(bool checked);
-	void pasteProperty(QString const &formula);
+	void runVerifier(QString const &formula);
 
-	/// Action that launches code generator
-	QAction *mGenerateCodeAction;  // Doesn't have ownership; may be disposed by GUI.
-	QAction *mRunVerifierAction;
 	QAction *mHighlightCounterexampleAction;
 	QAction *mLTLEditorAction;
 	Spin *mSpin = nullptr;

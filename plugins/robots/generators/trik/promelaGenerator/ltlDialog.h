@@ -15,10 +15,10 @@ public:
 	~LTLDialog();
 
 signals:
-	void okButtonPressed(QString const &formula);
+	void runVerifierButtonPressed(QString const &formula);
 
 private:
-	void onOkButtonPress();
+	void onRunVerifierButtonPress();
 
 	Ui::LTLDialog *ui;
 };
