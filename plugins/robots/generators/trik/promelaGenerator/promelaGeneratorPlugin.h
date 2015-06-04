@@ -34,6 +34,7 @@ private:
 	void nextBlock(bool checked);
 	void stopShowingCounterexample(bool checked);
 	void runVerifier(QString const &formula);
+	void generateThreadNames(QString const &src);
 
 	QAction *mHighlightCounterexampleAction;
 	QAction *mLTLEditorAction;

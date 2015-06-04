@@ -26,7 +26,6 @@ protected:
 
 private:
 	QString generateThreadsChannels();
-	void generateThreadNames();
 
 	const QString mGeneratorName;
 };

@@ -60,7 +60,7 @@ QList<ActionInfo> PromelaGeneratorPlugin::customActions()
 	connect(mStepByStepAction, &QAction::triggered, this
 			, &PromelaGeneratorPlugin::nextBlock, Qt::UniqueConnection);
 
-	mStopAction->setText(tr("Next Step"));
+	mStopAction->setText(tr("Stop"));
 	//mGenerateCodeAction->setIcon(QIcon(":/images/generateQtsCode.svg"));
 	ActionInfo stopActionInfo(mStopAction, "generators", "tools");
 	connect(mStopAction, &QAction::triggered, this
@@ -135,6 +135,23 @@ void PromelaGeneratorPlugin::stopShowingCounterexample(bool checked)
 	mSpin->stop();
 }
 
+void PromelaGeneratorPlugin::generateThreadNames(QString const &src)
+{
+	QRegExp re("(TASK[_]\\w+)[(][)][;]\\s[/][*](\\w+)[*][/]");
+	utils::OutFile out(qApp->applicationDirPath() + "/spin/threadNames");
+
+	for (QString const &line : src.split("\n")) {
+		int const pos = re.indexIn(line);
+
+		if (pos > -1) {
+			QString const id = re.cap(1);
+			QString const name = re.cap(2);
+
+			out() << id + " " + name + "\n";
+		}
+	}
+}
+
 void PromelaGeneratorPlugin::runVerifier(const QString &formula)
 {
 	QString srcPath = generateCode(false);
@@ -143,6 +160,7 @@ void PromelaGeneratorPlugin::runVerifier(const QString &formula)
 		QString const pattern =
 				"[/][*][@][@](\\bLTL_BEGIN\\b)[@][@][*][/](.*)[/][*][@][@](\\bLTL_END\\b)[@][@][*][/]";
 		QString generatedCode = utils::InFile::readAll(srcPath);
+		generateThreadNames(generatedCode);
 		generatedCode.replace(QRegExp(pattern),
 				"/*@@LTL_BEGIN@@*/\nltl l1 {" + formula +"}\n/*@@LTL_END@@*/");
 		QFile::remove(srcPath);
