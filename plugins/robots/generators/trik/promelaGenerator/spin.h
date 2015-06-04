@@ -26,6 +26,8 @@ public:
 
 	void run(const QFileInfo &fileInfo);
 	void highlightCounterexample();
+	void highlightNextBlock();
+	void stop();
 	void showLTLDialog();
 
 signals:
@@ -43,7 +45,7 @@ private:
 	void counterexampleBuildingFinished(int exitCode, QProcess::ExitStatus exitStatus);
 
 	void correctCFile();
-	void onTimeout();
+	void nextBlock();
 	qReal::Id graphicalId(qReal::Id logicalId);
 
 	QProcess mPromelaToCProcess;
@@ -59,6 +61,7 @@ private:
 	QList<qReal::Id> mCounterexample;
 	QMap<qReal::Id, QString> mBlockThread;
 	int mCurrentBlock = 0;
+	bool mStepByStep = false;
 	QTimer *mTimer;
 	LTLDialog *mLTLDialog;
 };

@@ -17,6 +17,8 @@ PromelaGeneratorPlugin::PromelaGeneratorPlugin()
 	: TrikGeneratorPluginBase("PromelaGeneratorRobotModel", tr("Generation (Promela)"), 7 /* Last order */)
 	, mHighlightCounterexampleAction(new QAction(nullptr))
 	, mLTLEditorAction(new QAction(nullptr))
+	, mStepByStepAction(new QAction(nullptr))
+	, mStopAction(new QAction(nullptr))
 {
 }
 
@@ -42,17 +44,30 @@ QList<ActionInfo> PromelaGeneratorPlugin::customActions()
 
 	mHighlightCounterexampleAction->setText(tr("Show counterexample"));
 	//mGenerateCodeAction->setIcon(QIcon(":/images/generateQtsCode.svg"));
-	ActionInfo mHighlightCounterexampleActionInfo(mHighlightCounterexampleAction, "generators", "tools");
+	ActionInfo highlightCounterexampleActionInfo(mHighlightCounterexampleAction, "generators", "tools");
 	connect(mHighlightCounterexampleAction, &QAction::triggered
 			, this, &PromelaGeneratorPlugin::showCounterexample, Qt::UniqueConnection);
 
 	mLTLEditorAction->setText(tr("Enter checked property"));
 	//mGenerateCodeAction->setIcon(QIcon(":/images/generateQtsCode.svg"));
-	ActionInfo mLTLEditorActionInfo(mLTLEditorAction, "generators", "tools");
+	ActionInfo ltlEditorActionInfo(mLTLEditorAction, "generators", "tools");
 	connect(mLTLEditorAction, &QAction::triggered
 			, this, &PromelaGeneratorPlugin::showLTLDialog, Qt::UniqueConnection);
 
-	return {mLTLEditorActionInfo, mHighlightCounterexampleActionInfo, separatorInfo};
+	mStepByStepAction->setText(tr("Next Step"));
+	//mGenerateCodeAction->setIcon(QIcon(":/images/generateQtsCode.svg"));
+	ActionInfo stepByStepActionInfo(mStepByStepAction, "generators", "tools");
+	connect(mStepByStepAction, &QAction::triggered, this
+			, &PromelaGeneratorPlugin::nextBlock, Qt::UniqueConnection);
+
+	mStopAction->setText(tr("Next Step"));
+	//mGenerateCodeAction->setIcon(QIcon(":/images/generateQtsCode.svg"));
+	ActionInfo stopActionInfo(mStopAction, "generators", "tools");
+	connect(mStopAction, &QAction::triggered, this
+			, &PromelaGeneratorPlugin::stopShowingCounterexample, Qt::UniqueConnection);
+
+	return {ltlEditorActionInfo, separatorInfo, highlightCounterexampleActionInfo, stepByStepActionInfo
+			, stopActionInfo, separatorInfo};
 }
 
 QList<HotKeyActionInfo> PromelaGeneratorPlugin::hotKeyActions()
@@ -104,6 +119,20 @@ void PromelaGeneratorPlugin::showLTLDialog(bool checked)
 	Q_UNUSED(checked)
 
 	mSpin->showLTLDialog();
+}
+
+void PromelaGeneratorPlugin::nextBlock(bool checked)
+{
+	Q_UNUSED(checked)
+
+	mSpin->highlightNextBlock();
+}
+
+void PromelaGeneratorPlugin::stopShowingCounterexample(bool checked)
+{
+	Q_UNUSED(checked)
+
+	mSpin->stop();
 }
 
 void PromelaGeneratorPlugin::runVerifier(const QString &formula)

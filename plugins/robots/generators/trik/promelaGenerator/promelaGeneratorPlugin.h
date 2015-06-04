@@ -31,10 +31,14 @@ protected:
 private:
 	void showCounterexample(bool checked);
 	void showLTLDialog(bool checked);
+	void nextBlock(bool checked);
+	void stopShowingCounterexample(bool checked);
 	void runVerifier(QString const &formula);
 
 	QAction *mHighlightCounterexampleAction;
 	QAction *mLTLEditorAction;
+	QAction *mStepByStepAction;
+	QAction *mStopAction;
 	Spin *mSpin = nullptr;
 };
 

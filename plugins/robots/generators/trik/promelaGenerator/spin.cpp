@@ -36,7 +36,7 @@ Spin::Spin(CodeBlockManagerInterface *codeBlockManager, gui::MainWindowInterpret
 	mCounterexampleProcess.setProcessEnvironment(environment);
 	connect(&mCounterexampleProcess, finished, this, &Spin::counterexampleBuildingFinished);
 
-	connect(mTimer, &QTimer::timeout, this, &Spin::onTimeout);
+	connect(mTimer, &QTimer::timeout, this, &Spin::nextBlock);
 	connect(mLTLDialog, &LTLDialog::runVerifierButtonPressed
 			, [this](QString const &formula) { emit formulaEntered(formula); });
 }
@@ -56,7 +56,9 @@ void Spin::run(const QFileInfo &fileInfo)
 void Spin::highlightCounterexample()
 {
 	if (!mCounterexample.isEmpty()) {
-		if (mCurrentBlock == 0) {
+		if (mCurrentBlock == 0 || mStepByStep) {
+			mCurrentBlock = 0;
+			mStepByStep = false;
 			mErrorReporter->clear();
 			mErrorReporter->clearErrors();
 			mMainWindow->highlight(graphicalId(mCounterexample[0]), false);
@@ -68,6 +70,40 @@ void Spin::highlightCounterexample()
 			mCurrentBlock = 0;
 		}
 	}
+}
+
+void Spin::highlightNextBlock()
+{
+	if (!mStepByStep) {
+		mTimer->stop();
+		if (mCurrentBlock != 0) {
+			mMainWindow->dehighlight(graphicalId(mCounterexample[mCurrentBlock]));
+		}
+		mCurrentBlock = 0;
+		mErrorReporter->clear();
+		mErrorReporter->clearErrors();
+		mStepByStep = true;
+	}
+
+	mMainWindow->highlight(graphicalId(mCounterexample[mCurrentBlock]));
+	if (mCurrentBlock != 0) {
+		mMainWindow->dehighlight(graphicalId(mCounterexample[mCurrentBlock - 1]));
+	}
+	mErrorReporter->addInformation("Current thread: " + mBlockThread.value(mCounterexample[mCurrentBlock]));
+	mCurrentBlock++;
+
+	if (mCurrentBlock == mCounterexample.size()) {
+		mCurrentBlock = 0;
+		mStepByStep = false;
+	}
+}
+
+void Spin::stop()
+{
+	mTimer->stop();
+	mMainWindow->dehighlight(graphicalId(mCounterexample[mCurrentBlock]));
+	mStepByStep = false;
+	mCurrentBlock = 0;
 }
 
 void Spin::showLTLDialog()
@@ -107,7 +143,7 @@ void Spin::correctCFile()
 	out.flush();
 }
 
-void Spin::onTimeout()
+void Spin::nextBlock()
 {
 	mMainWindow->dehighlight(graphicalId(mCounterexample[mCurrentBlock]));
 	mCurrentBlock++;
@@ -204,13 +240,15 @@ void Spin::counterexampleBuildingFinished(int exitCode, QProcess::ExitStatus exi
 			if (lineNumber != lastNumber) {
 				QList<Id> blocks = mCodeBlockManager->IdsByLineNumber(mFile.absoluteFilePath(), lineNumber);
 				if (!blocks.isEmpty()) {
-					mCounterexample.append(blocks.last());
-					re.setPattern(processIdPattern);
-					pos = re.indexIn(line);
+					if (mCounterexample.isEmpty() || mCounterexample.last() != blocks.last()) {
+						mCounterexample.append(blocks.last());
+						re.setPattern(processIdPattern);
+						pos = re.indexIn(line);
 
-					if (pos > -1) {
-						QString const threadId = re.cap().remove(QRegExp("[()]"));
-						mBlockThread.insert(blocks.last(), threadNames.value(threadId));
+						if (pos > -1) {
+							QString const threadId = re.cap().remove(QRegExp("[()]"));
+							mBlockThread.insert(blocks.last(), threadNames.value(threadId));
+						}
 					}
 				}
 				lastNumber = lineNumber;
