@@ -1,2 +1,5 @@
 /*wait light*/
-(port@@PORT@@ == triggered);
+do
+::skip;
+::break;
+od;

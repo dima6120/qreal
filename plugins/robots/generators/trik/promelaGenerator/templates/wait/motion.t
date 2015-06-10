@@ -1,2 +1,5 @@
 /*wait motion*/
-(portF1 == triggered);
+do
+::skip;
+::break;
+od;

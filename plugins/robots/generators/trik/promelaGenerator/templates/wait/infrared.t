@@ -1,2 +1,5 @@
 /*wait infrared*/
-(port@@PORT@@ == triggered);
+do
+::skip;
+::break;
+od;

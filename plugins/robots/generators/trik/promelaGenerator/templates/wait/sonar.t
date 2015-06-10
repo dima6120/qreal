@@ -1,2 +1,5 @@
 /*wait sonar*/
-(port@@PORT@@ == triggered);
+do
+::skip;
+::break;
+od;

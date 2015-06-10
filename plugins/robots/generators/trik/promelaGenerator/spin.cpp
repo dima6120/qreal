@@ -101,7 +101,7 @@ void Spin::highlightNextBlock()
 void Spin::stop()
 {
 	mTimer->stop();
-	mMainWindow->dehighlight(graphicalId(mCounterexample[mCurrentBlock]));
+	mMainWindow->dehighlight(graphicalId(mCounterexample[mStepByStep ? mCurrentBlock - 1 : mCurrentBlock]));
 	mStepByStep = false;
 	mCurrentBlock = 0;
 }
